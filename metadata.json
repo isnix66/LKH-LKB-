@@ -1,0 +1,8 @@
+{
+  "name": "LKH / LKB",
+  "description": "Aplikasi LKH dan LKB untuk pencatatan kegiatan harian dan bulanan tersinkronisasi real-time ke Google Sheets.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
