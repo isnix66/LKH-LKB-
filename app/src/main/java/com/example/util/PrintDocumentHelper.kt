@@ -531,9 +531,19 @@ object PrintDocumentHelper {
 
         // Info Block
         normPaint.textSize = 10f
-        canvas.drawText("Nama        : ${profile.pegNama}", 45f, currentY, normPaint)
-        canvas.drawText("NIP           : ${profile.pegNIP}", 45f, currentY + 14f, normPaint)
-        canvas.drawText("Jabatan     : ${profile.pegJabatan}", 45f, currentY + 28f, normPaint)
+        val lblX = 45f
+        val colX = 130f
+        val valX = 140f
+        
+        fun drawInfoLkb(label: String, value: String, yOffset: Float) {
+            canvas.drawText(label, lblX, currentY + yOffset, normPaint)
+            canvas.drawText(":", colX, currentY + yOffset, normPaint)
+            canvas.drawText(value, valX, currentY + yOffset, normPaint)
+        }
+
+        drawInfoLkb("Nama", profile.pegNama, 0f)
+        drawInfoLkb("NIP", profile.pegNIP, 14f)
+        drawInfoLkb("Jabatan", profile.pegJabatan, 28f)
         currentY += 42f
 
         // Table
@@ -672,11 +682,22 @@ object PrintDocumentHelper {
 
         var currentY = 70f
         normPaint.textSize = 9.5f
-        canvas.drawText("Nama            : ${profile.pegNama.uppercase(Locale.getDefault())}", 45f, currentY, normPaint)
-        canvas.drawText("NIP               : ${profile.pegNIP}", 45f, currentY + 13f, normPaint)
-        canvas.drawText("Jabatan         : ${profile.pegJabatan}", 45f, currentY + 26f, normPaint)
-        canvas.drawText("Pangkat        : ${profile.pegPangkat}", 45f, currentY + 39f, normPaint)
-        canvas.drawText("Golongan       : ${profile.pegGolongan}", 45f, currentY + 52f, normPaint)
+        
+        val lblX = 45f
+        val colX = 130f
+        val valX = 140f
+        
+        fun drawInfoLkh(label: String, value: String, yOffset: Float) {
+            canvas.drawText(label, lblX, currentY + yOffset, normPaint)
+            canvas.drawText(":", colX, currentY + yOffset, normPaint)
+            canvas.drawText(value, valX, currentY + yOffset, normPaint)
+        }
+
+        drawInfoLkh("Nama", profile.pegNama.uppercase(Locale.getDefault()), 0f)
+        drawInfoLkh("NIP", profile.pegNIP, 13f)
+        drawInfoLkh("Jabatan", profile.pegJabatan, 26f)
+        drawInfoLkh("Pangkat", profile.pegPangkat, 39f)
+        drawInfoLkh("Golongan", profile.pegGolongan, 52f)
         currentY += 70f
 
         currentY = drawTableHeader(currentY)
