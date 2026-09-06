@@ -7,6 +7,7 @@ import android.util.Base64
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -16,15 +17,19 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AutoStories
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Collections
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.Print
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Upload
+import androidx.compose.material.icons.filled.ViewList
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -39,6 +44,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -48,9 +54,7 @@ import com.example.R
 import com.example.data.model.KegiatanEntry
 import com.example.data.model.UserProfile
 import com.example.ui.components.SectionHeader
-import com.example.ui.theme.DeepNavy
-import com.example.ui.theme.LightBorder
-import com.example.ui.theme.RoyalBlue
+import com.example.ui.theme.*
 import com.example.util.DateUtils
 import com.example.util.PrintDocumentHelper
 import java.io.ByteArrayOutputStream
@@ -109,6 +113,7 @@ fun PusatCetakScreen(
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
+            .background(NokiaBackground)
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
@@ -120,19 +125,20 @@ fun PusatCetakScreen(
         item {
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(containerColor = NokiaCardSurface),
+                border = BorderStroke(1.5.dp, NokiaCyan.copy(alpha = 0.35f)),
+                elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
             ) {
                 Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                    modifier = Modifier.padding(18.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Text(
                         text = "Pilih Format Laporan (${if (dataKegiatan.isEmpty()) "Tidak ada data pada bulan terpilih" else "${dataKegiatan.size} kegiatan"})",
-                        style = MaterialTheme.typography.bodySmall.copy(
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            fontWeight = FontWeight.Medium
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            color = NokiaTextSecondary,
+                            fontWeight = FontWeight.Bold
                         )
                     )
 
@@ -142,11 +148,13 @@ fun PusatCetakScreen(
                             .fillMaxWidth()
                             .height(52.dp)
                             .testTag("btn_cetak_sampul"),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(14.dp),
+                        border = BorderStroke(1.5.dp, NokiaCyan.copy(alpha = 0.5f)),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = NokiaTextPrimary)
                     ) {
-                        Icon(Icons.Default.Description, contentDescription = null, modifier = Modifier.size(20.dp))
+                        Icon(Icons.Default.Description, contentDescription = null, modifier = Modifier.size(20.dp), tint = NokiaCyanDark)
                         Spacer(modifier = Modifier.width(10.dp))
-                        Text("📄 Cetak Sampul Laporan Kinerja", fontWeight = FontWeight.SemiBold)
+                        Text("📄 1. Cetak Sampul Laporan Kinerja", fontWeight = FontWeight.Bold, color = NokiaTextPrimary)
                     }
 
                     OutlinedButton(
@@ -156,11 +164,13 @@ fun PusatCetakScreen(
                             .fillMaxWidth()
                             .height(52.dp)
                             .testTag("btn_cetak_lkh"),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(14.dp),
+                        border = BorderStroke(1.5.dp, NokiaCyan.copy(alpha = 0.5f)),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = NokiaTextPrimary)
                     ) {
-                        Icon(Icons.Default.Collections, contentDescription = null, modifier = Modifier.size(20.dp))
+                        Icon(Icons.Default.ViewList, contentDescription = null, modifier = Modifier.size(20.dp), tint = NokiaCyanDark)
                         Spacer(modifier = Modifier.width(10.dp))
-                        Text("📋 Cetak LKH (Laporan Kerja Harian)", fontWeight = FontWeight.SemiBold)
+                        Text("📋 2. Cetak LKH (Laporan Kerja Harian)", fontWeight = FontWeight.Bold, color = NokiaTextPrimary)
                     }
 
                     OutlinedButton(
@@ -170,11 +180,13 @@ fun PusatCetakScreen(
                             .fillMaxWidth()
                             .height(52.dp)
                             .testTag("btn_cetak_lkb"),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(14.dp),
+                        border = BorderStroke(1.5.dp, NokiaCyan.copy(alpha = 0.5f)),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = NokiaTextPrimary)
                     ) {
-                        Icon(Icons.Default.DateRange, contentDescription = null, modifier = Modifier.size(20.dp))
+                        Icon(Icons.Default.CalendarMonth, contentDescription = null, modifier = Modifier.size(20.dp), tint = NokiaCyanDark)
                         Spacer(modifier = Modifier.width(10.dp))
-                        Text("📅 Cetak LKB (Laporan Kerja Bulanan)", fontWeight = FontWeight.SemiBold)
+                        Text("📅 3. Cetak LKB (Laporan Kerja Bulanan)", fontWeight = FontWeight.Bold, color = NokiaTextPrimary)
                     }
 
                     Button(
@@ -184,12 +196,13 @@ fun PusatCetakScreen(
                             .fillMaxWidth()
                             .height(54.dp)
                             .testTag("btn_cetak_semua"),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = RoyalBlue)
+                        shape = RoundedCornerShape(14.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = NokiaCyan, contentColor = Color.White),
+                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 3.dp)
                     ) {
-                        Icon(Icons.Default.MenuBook, contentDescription = null, modifier = Modifier.size(20.dp))
+                        Icon(Icons.Default.AutoStories, contentDescription = null, modifier = Modifier.size(20.dp))
                         Spacer(modifier = Modifier.width(10.dp))
-                        Text("📚 Cetak Seluruh Laporan (Sampul + LKH + LKB)", fontWeight = FontWeight.Bold)
+                        Text("📚 Cetak Lengkap: Sampul + LKH + LKB", fontWeight = FontWeight.Bold, fontSize = 15.sp)
                     }
                 }
             }
@@ -203,15 +216,17 @@ fun PusatCetakScreen(
         item {
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(containerColor = NokiaCardSurface),
+                border = BorderStroke(1.5.dp, NokiaCyan.copy(alpha = 0.35f)),
+                elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
             ) {
-                Column(modifier = Modifier.padding(16.dp)) {
+                Column(modifier = Modifier.padding(18.dp)) {
                     Text(
                         text = "Logo ini dicetak pada Kop Surat LKH dan LKB.",
                         style = MaterialTheme.typography.bodySmall.copy(
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = NokiaTextSecondary,
+                            fontWeight = FontWeight.Medium
                         )
                     )
 
@@ -220,12 +235,12 @@ fun PusatCetakScreen(
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(120.dp)
+                            .height(130.dp)
                             .background(
-                                MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-                                shape = RoundedCornerShape(12.dp)
+                                NokiaCardSurfaceVariant,
+                                shape = RoundedCornerShape(14.dp)
                             )
-                            .border(1.dp, LightBorder, RoundedCornerShape(12.dp)),
+                            .border(1.5.dp, NokiaBorder, RoundedCornerShape(14.dp)),
                         contentAlignment = Alignment.Center
                     ) {
                         if (decodedLogoBitmap != null) {
@@ -233,7 +248,7 @@ fun PusatCetakScreen(
                                 bitmap = decodedLogoBitmap,
                                 contentDescription = "Logo Instansi Khusus",
                                 modifier = Modifier
-                                    .fillMaxHeight(0.8f)
+                                    .fillMaxHeight(0.85f)
                                     .padding(8.dp),
                                 contentScale = ContentScale.Fit
                             )
@@ -242,7 +257,7 @@ fun PusatCetakScreen(
                                 painter = painterResource(R.drawable.ic_kemenag_badge),
                                 contentDescription = "Logo Kemenag Default",
                                 modifier = Modifier
-                                    .fillMaxHeight(0.8f)
+                                    .fillMaxHeight(0.85f)
                                     .padding(8.dp),
                                 contentScale = ContentScale.Fit
                             )
@@ -263,25 +278,29 @@ fun PusatCetakScreen(
                             },
                             modifier = Modifier
                                 .weight(1f)
+                                .height(48.dp)
                                 .testTag("btn_upload_logo"),
-                            shape = RoundedCornerShape(10.dp)
+                            shape = RoundedCornerShape(12.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = NokiaCyan, contentColor = Color.White)
                         ) {
-                            Icon(Icons.Default.Upload, contentDescription = null, modifier = Modifier.size(16.dp))
+                            Icon(Icons.Default.Upload, contentDescription = null, modifier = Modifier.size(18.dp))
                             Spacer(modifier = Modifier.width(6.dp))
-                            Text("Upload Logo")
+                            Text("Upload Logo", fontWeight = FontWeight.Bold)
                         }
 
                         OutlinedButton(
                             onClick = onDeleteLogo,
                             modifier = Modifier
                                 .weight(1f)
+                                .height(48.dp)
                                 .testTag("btn_hapus_logo"),
-                            shape = RoundedCornerShape(10.dp),
-                            colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error)
+                            shape = RoundedCornerShape(12.dp),
+                            border = BorderStroke(1.5.dp, NokiaRed.copy(alpha = 0.6f)),
+                            colors = ButtonDefaults.outlinedButtonColors(contentColor = NokiaRed)
                         ) {
-                            Icon(Icons.Default.Delete, contentDescription = null, modifier = Modifier.size(16.dp))
+                            Icon(Icons.Default.Delete, contentDescription = null, modifier = Modifier.size(18.dp))
                             Spacer(modifier = Modifier.width(6.dp))
-                            Text("Reset Logo")
+                            Text("Reset Logo", fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -297,7 +316,7 @@ fun PusatCetakScreen(
             ) {
                 Text(
                     text = "Dirancang khusus untuk MTs N 2 Garut • Terintegrasi Google Workspace",
-                    style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    style = MaterialTheme.typography.labelSmall.copy(color = NokiaTextTertiary, fontWeight = FontWeight.SemiBold)
                 )
             }
         }
@@ -316,35 +335,53 @@ fun PusatCetakScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(10.dp),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(containerColor = NokiaCardSurface)
             ) {
                 Column(modifier = Modifier.fillMaxSize()) {
                     // Dialog Header with actions
-                    Row(
+                    Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(12.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                            .background(NokiaCardSurface)
+                            .padding(horizontal = 16.dp, vertical = 12.dp)
                     ) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = previewTitle,
-                                style = MaterialTheme.typography.titleMedium.copy(
-                                    fontWeight = FontWeight.Bold,
-                                    color = DeepNavy
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = previewTitle,
+                                    style = MaterialTheme.typography.titleMedium.copy(
+                                        fontWeight = FontWeight.Bold,
+                                        color = NokiaTextPrimary,
+                                        fontSize = 16.sp
+                                    )
                                 )
-                            )
-                            Text(
-                                text = "Pratinjau Resmi Siap Cetak • Format A4 Standar",
-                                style = MaterialTheme.typography.labelSmall.copy(
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                Text(
+                                    text = "Pratinjau Dokumen Format A4 Resmi",
+                                    style = MaterialTheme.typography.labelSmall.copy(
+                                        color = NokiaTextSecondary,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
                                 )
-                            )
+                            }
+
+                            IconButton(
+                                onClick = { activePreviewType = null }
+                            ) {
+                                Icon(Icons.Default.Close, contentDescription = "Tutup", tint = NokiaTextPrimary)
+                            }
                         }
 
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
                             FilledTonalButton(
                                 onClick = {
                                     PrintDocumentHelper.sharePdfDocument(
@@ -357,12 +394,16 @@ fun PusatCetakScreen(
                                         logoBase64 = logoBase64
                                     )
                                 },
-                                shape = RoundedCornerShape(10.dp),
-                                modifier = Modifier.testTag("btn_share_pdf")
+                                shape = RoundedCornerShape(12.dp),
+                                colors = ButtonDefaults.filledTonalButtonColors(containerColor = NokiaCyanLight, contentColor = NokiaCyanDark),
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(44.dp)
+                                    .testTag("btn_share_pdf")
                             ) {
                                 Icon(Icons.Default.Share, contentDescription = null, modifier = Modifier.size(16.dp))
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text("Bagikan", fontWeight = FontWeight.SemiBold, fontSize = 12.sp)
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text("Bagikan PDF", fontWeight = FontWeight.Bold, fontSize = 13.sp)
                             }
 
                             Button(
@@ -377,31 +418,29 @@ fun PusatCetakScreen(
                                         logoBase64 = logoBase64
                                     )
                                 },
-                                colors = ButtonDefaults.buttonColors(containerColor = RoyalBlue),
-                                shape = RoundedCornerShape(10.dp),
-                                modifier = Modifier.testTag("btn_trigger_print")
+                                colors = ButtonDefaults.buttonColors(containerColor = NokiaCyan, contentColor = Color.White),
+                                shape = RoundedCornerShape(12.dp),
+                                elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp),
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(44.dp)
+                                    .testTag("btn_trigger_print")
                             ) {
                                 Icon(Icons.Default.Print, contentDescription = null, modifier = Modifier.size(16.dp))
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text("Cetak / PDF", fontWeight = FontWeight.Bold, fontSize = 12.sp)
-                            }
-
-                            IconButton(
-                                onClick = { activePreviewType = null }
-                            ) {
-                                Icon(Icons.Default.Close, contentDescription = "Tutup")
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text("Cetak / PDF", fontWeight = FontWeight.Bold, fontSize = 13.sp)
                             }
                         }
                     }
 
-                    HorizontalDivider()
+                    HorizontalDivider(color = NokiaBorder, thickness = 1.dp)
 
                     // Native Compose Document Sheet
                     Box(
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxWidth()
-                            .background(Color(0xFFF1F5F9))
+                            .background(NokiaBackground)
                             .verticalScroll(rememberScrollState())
                             .padding(vertical = 16.dp, horizontal = 8.dp),
                         contentAlignment = Alignment.TopCenter
@@ -413,7 +452,7 @@ fun PusatCetakScreen(
                             shape = RoundedCornerShape(8.dp),
                             color = Color.White,
                             shadowElevation = 4.dp,
-                            border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFE2E8F0))
+                            border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFCBD5E1))
                         ) {
                             Column(
                                 modifier = Modifier
@@ -755,19 +794,27 @@ private fun NativeSampulSection(
 }
 
 @Composable
-private fun IdentitasRow(label: String, value: String, isBold: Boolean = false) {
+private fun IdentitasRow(
+    label: String,
+    value: String,
+    labelWidth: androidx.compose.ui.unit.Dp = 110.dp,
+    fontSize: androidx.compose.ui.unit.TextUnit = 10.5.sp,
+    isBold: Boolean = false
+) {
     Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
         Text(
             text = label,
-            modifier = Modifier.width(110.dp),
-            fontSize = 10.5.sp,
+            modifier = Modifier.width(labelWidth),
+            fontSize = fontSize,
             fontWeight = FontWeight.Bold,
             fontFamily = FontFamily.Serif,
-            color = Color.Black
+            color = Color.Black,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
         )
         Text(
             text = ":  ",
-            fontSize = 10.5.sp,
+            fontSize = fontSize,
             fontWeight = FontWeight.Bold,
             fontFamily = FontFamily.Serif,
             color = Color.Black
@@ -775,10 +822,12 @@ private fun IdentitasRow(label: String, value: String, isBold: Boolean = false) 
         Text(
             text = value,
             modifier = Modifier.weight(1f),
-            fontSize = 10.5.sp,
+            fontSize = fontSize,
             fontWeight = if (isBold) FontWeight.Bold else FontWeight.Normal,
             fontFamily = FontFamily.Serif,
-            color = Color.Black
+            color = Color.Black,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
         )
     }
 }
@@ -816,9 +865,9 @@ private fun NativeLkbSection(
     Spacer(modifier = Modifier.height(14.dp))
 
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        Text("Nama        : ${profile.pegNama}", fontSize = 10.sp, fontFamily = FontFamily.Serif, color = Color.Black)
-        Text("NIP           : ${profile.pegNIP}", fontSize = 10.sp, fontFamily = FontFamily.Serif, color = Color.Black)
-        Text("Jabatan     : ${profile.pegJabatan}", fontSize = 10.sp, fontFamily = FontFamily.Serif, color = Color.Black)
+        IdentitasRow("Nama", profile.pegNama, labelWidth = 100.dp, fontSize = 10.sp, isBold = true)
+        IdentitasRow("NIP", profile.pegNIP, labelWidth = 100.dp, fontSize = 10.sp)
+        IdentitasRow("Jabatan", profile.pegJabatan, labelWidth = 100.dp, fontSize = 10.sp)
     }
 
     Spacer(modifier = Modifier.height(14.dp))
@@ -988,11 +1037,11 @@ private fun NativeLkhSection(
     Spacer(modifier = Modifier.height(14.dp))
 
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        Text("Nama            : ${profile.pegNama.uppercase(Locale.getDefault())}", fontSize = 9.5.sp, fontFamily = FontFamily.Serif, color = Color.Black)
-        Text("NIP               : ${profile.pegNIP}", fontSize = 9.5.sp, fontFamily = FontFamily.Serif, color = Color.Black)
-        Text("Level Jabatan: ${profile.pegJabatan}", fontSize = 9.5.sp, fontFamily = FontFamily.Serif, color = Color.Black)
-        Text("Pangkat        : ${profile.pegPangkat}", fontSize = 9.5.sp, fontFamily = FontFamily.Serif, color = Color.Black)
-        Text("Golongan       : ${profile.pegGolongan}", fontSize = 9.5.sp, fontFamily = FontFamily.Serif, color = Color.Black)
+        IdentitasRow("Nama", profile.pegNama.uppercase(Locale.getDefault()), labelWidth = 100.dp, fontSize = 9.5.sp, isBold = true)
+        IdentitasRow("NIP", profile.pegNIP, labelWidth = 100.dp, fontSize = 9.5.sp)
+        IdentitasRow("Jabatan", profile.pegJabatan, labelWidth = 100.dp, fontSize = 9.5.sp)
+        IdentitasRow("Pangkat", profile.pegPangkat, labelWidth = 100.dp, fontSize = 9.5.sp)
+        IdentitasRow("Golongan", profile.pegGolongan, labelWidth = 100.dp, fontSize = 9.5.sp)
     }
 
     Spacer(modifier = Modifier.height(14.dp))

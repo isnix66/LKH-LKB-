@@ -152,7 +152,7 @@ object PrintDocumentHelper {
                     <table style="width:100%; border:none; margin-bottom:15px;">
                         <tr><td width="150">Nama</td><td>: ${profile.pegNama.uppercase(Locale.getDefault())}</td></tr>
                         <tr><td>NIP</td><td>: ${profile.pegNIP}</td></tr>
-                        <tr><td>Level Jabatan</td><td>: ${profile.pegJabatan}</td></tr>
+                        <tr><td>Jabatan</td><td>: ${profile.pegJabatan}</td></tr>
                         <tr><td>Pangkat</td><td>: ${profile.pegPangkat}</td></tr>
                         <tr><td>Golongan Ruang</td><td>: ${profile.pegGolongan}</td></tr>
                     </table>
@@ -694,7 +694,7 @@ object PrintDocumentHelper {
         normPaint.textSize = 9.5f
         canvas.drawText("Nama            : ${profile.pegNama.uppercase(Locale.getDefault())}", 45f, currentY, normPaint)
         canvas.drawText("NIP               : ${profile.pegNIP}", 45f, currentY + 13f, normPaint)
-        canvas.drawText("Level Jabatan: ${profile.pegJabatan}", 45f, currentY + 26f, normPaint)
+        canvas.drawText("Jabatan         : ${profile.pegJabatan}", 45f, currentY + 26f, normPaint)
         canvas.drawText("Pangkat        : ${profile.pegPangkat}", 45f, currentY + 39f, normPaint)
         canvas.drawText("Golongan       : ${profile.pegGolongan}", 45f, currentY + 52f, normPaint)
         currentY += 70f

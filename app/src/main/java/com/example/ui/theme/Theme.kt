@@ -12,57 +12,57 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val LightColorScheme = lightColorScheme(
-    primary = RoyalBlue,
+    primary = IosBlue,
     onPrimary = Color.White,
-    primaryContainer = RoyalBlueLight,
-    onPrimaryContainer = RoyalBlueDark,
-    secondary = EmeraldSuccess,
+    primaryContainer = IosBlueLight,
+    onPrimaryContainer = IosBlueDark,
+    secondary = IosGreen,
     onSecondary = Color.White,
-    secondaryContainer = EmeraldSuccessLight,
-    onSecondaryContainer = Color(0xFF065F46),
-    tertiary = AmberAccent,
+    secondaryContainer = IosGreenLight,
+    onSecondaryContainer = IosGreenDark,
+    tertiary = IosOrange,
     onTertiary = Color.White,
-    tertiaryContainer = AmberLight,
-    onTertiaryContainer = Color(0xFF92400E),
-    background = BodyBackground,
-    onBackground = DeepNavy,
-    surface = CardBackground,
-    onSurface = SlateGray,
-    surfaceVariant = Color(0xFFF8FAFC),
-    onSurfaceVariant = MutedSlate,
-    outline = LightBorder,
-    error = RedDanger,
+    tertiaryContainer = IosOrangeLight,
+    onTertiaryContainer = Color(0xFF8A4D00),
+    background = IosBackground,
+    onBackground = IosTextPrimary,
+    surface = IosCardSurface,
+    onSurface = IosTextPrimary,
+    surfaceVariant = IosCardSurfaceVariant,
+    onSurfaceVariant = IosTextSecondary,
+    outline = IosBorder,
+    error = IosRed,
     onError = Color.White,
-    errorContainer = RedDangerLight,
-    onErrorContainer = RedDanger
+    errorContainer = IosRedLight,
+    onErrorContainer = IosRedDark
 )
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Color(0xFF60A5FA),
-    onPrimary = Color(0xFF1E3A8A),
-    primaryContainer = Color(0xFF1E40AF),
-    onPrimaryContainer = Color(0xFFDBEAFE),
-    secondary = Color(0xFF34D399),
-    onSecondary = Color(0xFF064E3B),
-    secondaryContainer = Color(0xFF065F46),
-    onSecondaryContainer = Color(0xFFA7F3D0),
-    tertiary = Color(0xFFFBBF24),
-    onTertiary = Color(0xFF78350F),
-    background = Color(0xFF0F172A),
-    onBackground = Color(0xFFF8FAFC),
-    surface = Color(0xFF1E293B),
-    onSurface = Color(0xFFF1F5F9),
-    surfaceVariant = Color(0xFF334155),
-    onSurfaceVariant = Color(0xFF94A3B8),
-    outline = Color(0xFF475569),
-    error = Color(0xFFF87171),
-    onError = Color(0xFF450A0A)
+    primary = Color(0xFF0A84FF),
+    onPrimary = Color(0xFF002244),
+    primaryContainer = Color(0xFF004080),
+    onPrimaryContainer = Color(0xFFD0E6FF),
+    secondary = Color(0xFF30D158),
+    onSecondary = Color(0xFF003814),
+    secondaryContainer = Color(0xFF0A5524),
+    onSecondaryContainer = Color(0xFFC7F8D4),
+    tertiary = Color(0xFFFF9F0A),
+    onTertiary = Color(0xFF4A2800),
+    background = IosDarkBackground,
+    onBackground = IosDarkTextPrimary,
+    surface = IosDarkCard,
+    onSurface = IosDarkTextPrimary,
+    surfaceVariant = IosDarkCardVariant,
+    onSurfaceVariant = IosDarkTextSecondary,
+    outline = IosDarkBorder,
+    error = Color(0xFFFF453A),
+    onError = Color(0xFF490005)
 )
 
 @Composable
 fun MyApplicationTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = false, // Use our brand colors by default
+    dynamicColor: Boolean = false, // Use our refined iOS colors by default
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
@@ -80,3 +80,4 @@ fun MyApplicationTheme(
         content = content
     )
 }
+

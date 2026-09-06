@@ -1,16 +1,18 @@
 package com.example.ui.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.example.data.model.UserAccount
-import com.example.ui.theme.DeepNavy
+import com.example.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -31,8 +33,10 @@ fun AdminUserDialog(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+            shape = RoundedCornerShape(22.dp),
+            colors = CardDefaults.cardColors(containerColor = NokiaCardSurface),
+            border = BorderStroke(1.5.dp, NokiaCyan.copy(alpha = 0.35f)),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
         ) {
             Column(
                 modifier = Modifier
@@ -40,14 +44,14 @@ fun AdminUserDialog(
                     .padding(20.dp)
             ) {
                 Text(
-                    text = if (isEdit) "✏️ Edit User" else "➕ Tambah User Baru",
+                    text = if (isEdit) "✏️ Edit Pengguna" else "➕ Tambah Pengguna Baru",
                     style = MaterialTheme.typography.titleLarge.copy(
                         fontWeight = FontWeight.Bold,
-                        color = DeepNavy
+                        color = NokiaTextPrimary
                     )
                 )
 
-                Spacer(modifier = Modifier.height(14.dp))
+                Spacer(modifier = Modifier.height(16.dp))
                 OutlinedTextField(
                     value = username,
                     onValueChange = { username = it },
@@ -56,7 +60,15 @@ fun AdminUserDialog(
                         .fillMaxWidth()
                         .testTag("admin_username_input"),
                     singleLine = true,
-                    shape = RoundedCornerShape(10.dp)
+                    shape = RoundedCornerShape(12.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = NokiaCyan,
+                        unfocusedBorderColor = NokiaBorder,
+                        focusedTextColor = NokiaTextPrimary,
+                        unfocusedTextColor = NokiaTextPrimary,
+                        focusedContainerColor = Color.White,
+                        unfocusedContainerColor = NokiaCardSurfaceVariant
+                    )
                 )
 
                 Spacer(modifier = Modifier.height(10.dp))
@@ -68,7 +80,15 @@ fun AdminUserDialog(
                         .fillMaxWidth()
                         .testTag("admin_password_input"),
                     singleLine = true,
-                    shape = RoundedCornerShape(10.dp)
+                    shape = RoundedCornerShape(12.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = NokiaCyan,
+                        unfocusedBorderColor = NokiaBorder,
+                        focusedTextColor = NokiaTextPrimary,
+                        unfocusedTextColor = NokiaTextPrimary,
+                        focusedContainerColor = Color.White,
+                        unfocusedContainerColor = NokiaCardSurfaceVariant
+                    )
                 )
 
                 Spacer(modifier = Modifier.height(10.dp))
@@ -80,7 +100,15 @@ fun AdminUserDialog(
                         .fillMaxWidth()
                         .testTag("admin_display_name_input"),
                     singleLine = true,
-                    shape = RoundedCornerShape(10.dp)
+                    shape = RoundedCornerShape(12.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = NokiaCyan,
+                        unfocusedBorderColor = NokiaBorder,
+                        focusedTextColor = NokiaTextPrimary,
+                        unfocusedTextColor = NokiaTextPrimary,
+                        focusedContainerColor = Color.White,
+                        unfocusedContainerColor = NokiaCardSurfaceVariant
+                    )
                 )
 
                 Spacer(modifier = Modifier.height(10.dp))
@@ -88,20 +116,28 @@ fun AdminUserDialog(
                     value = expireDate,
                     onValueChange = { expireDate = it },
                     label = { Text("Masa Berlaku (YYYY-MM-DD)") },
-                    placeholder = { Text("Kosongkan untuk tanpa batas") },
+                    placeholder = { Text("Kosongkan untuk tanpa batas", color = NokiaTextTertiary) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .testTag("admin_expire_date_input"),
                     singleLine = true,
-                    shape = RoundedCornerShape(10.dp)
+                    shape = RoundedCornerShape(12.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = NokiaCyan,
+                        unfocusedBorderColor = NokiaBorder,
+                        focusedTextColor = NokiaTextPrimary,
+                        unfocusedTextColor = NokiaTextPrimary,
+                        focusedContainerColor = Color.White,
+                        unfocusedContainerColor = NokiaCardSurfaceVariant
+                    )
                 )
 
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(12.dp))
                 Text(
-                    text = "Role",
+                    text = "Peran (Role)",
                     style = MaterialTheme.typography.labelSmall,
-                    fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    fontWeight = FontWeight.Bold,
+                    color = NokiaTextSecondary
                 )
                 Spacer(modifier = Modifier.height(4.dp))
 
@@ -118,21 +154,29 @@ fun AdminUserDialog(
                         modifier = Modifier
                             .menuAnchor()
                             .fillMaxWidth(),
-                        shape = RoundedCornerShape(10.dp)
+                        shape = RoundedCornerShape(12.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = NokiaCyan,
+                            unfocusedBorderColor = NokiaBorder,
+                            focusedTextColor = NokiaTextPrimary,
+                            unfocusedTextColor = NokiaTextPrimary,
+                            focusedContainerColor = Color.White,
+                            unfocusedContainerColor = NokiaCardSurfaceVariant
+                        )
                     )
                     ExposedDropdownMenu(
                         expanded = roleExpanded,
                         onDismissRequest = { roleExpanded = false }
                     ) {
                         DropdownMenuItem(
-                            text = { Text("User Biasa") },
+                            text = { Text("User Biasa", color = NokiaTextPrimary, fontWeight = FontWeight.SemiBold) },
                             onClick = {
                                 role = "user"
                                 roleExpanded = false
                             }
                         )
                         DropdownMenuItem(
-                            text = { Text("Admin") },
+                            text = { Text("Admin", color = NokiaOrangeDark, fontWeight = FontWeight.Bold) },
                             onClick = {
                                 role = "admin"
                                 roleExpanded = false
@@ -148,10 +192,12 @@ fun AdminUserDialog(
                 ) {
                     OutlinedButton(
                         onClick = onDismiss,
-                        modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(10.dp)
+                        modifier = Modifier.weight(1f).height(48.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        border = BorderStroke(1.dp, NokiaBorder),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = NokiaTextSecondary)
                     ) {
-                        Text("Batal")
+                        Text("Batal", fontWeight = FontWeight.Bold)
                     }
 
                     Button(
@@ -172,13 +218,17 @@ fun AdminUserDialog(
                         },
                         modifier = Modifier
                             .weight(1f)
+                            .height(48.dp)
                             .testTag("admin_btn_save_user"),
-                        shape = RoundedCornerShape(10.dp)
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = NokiaCyan, contentColor = Color.White),
+                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp)
                     ) {
-                        Text(if (isEdit) "Simpan" else "Tambah", fontWeight = FontWeight.SemiBold)
+                        Text(if (isEdit) "Simpan" else "Tambah", fontWeight = FontWeight.Bold)
                     }
                 }
             }
         }
     }
 }
+

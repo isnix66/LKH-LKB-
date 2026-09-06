@@ -21,10 +21,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import com.example.ui.theme.DeepNavy
-import com.example.ui.theme.RoyalBlue
-import com.example.ui.theme.RoyalBlueLight
+import com.example.ui.theme.*
 import com.example.util.DateUtils
 import java.util.Locale
 
@@ -56,8 +55,9 @@ fun MonthYearPickerDialog(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(8.dp),
-            shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            shape = RoundedCornerShape(22.dp),
+            colors = CardDefaults.cardColors(containerColor = NokiaCardSurface),
+            border = BorderStroke(1.5.dp, NokiaCyan.copy(alpha = 0.35f)),
             elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
         ) {
             Column(
@@ -74,7 +74,7 @@ fun MonthYearPickerDialog(
                         Icon(
                             Icons.Default.CalendarMonth,
                             contentDescription = null,
-                            tint = RoyalBlue,
+                            tint = NokiaCyanDark,
                             modifier = Modifier.size(24.dp)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
@@ -82,7 +82,7 @@ fun MonthYearPickerDialog(
                             text = "Pilih Bulan & Tahun",
                             style = MaterialTheme.typography.titleMedium.copy(
                                 fontWeight = FontWeight.Bold,
-                                color = DeepNavy
+                                color = NokiaTextPrimary
                             )
                         )
                     }
@@ -92,14 +92,15 @@ fun MonthYearPickerDialog(
 
                 // Year selector controls
                 Surface(
-                    shape = RoundedCornerShape(12.dp),
-                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                    shape = RoundedCornerShape(14.dp),
+                    color = NokiaCardSurfaceVariant,
+                    border = BorderStroke(1.dp, NokiaBorder),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 8.dp, vertical = 4.dp),
+                            .padding(horizontal = 8.dp, vertical = 6.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -107,14 +108,14 @@ fun MonthYearPickerDialog(
                             onClick = { selectedYear-- },
                             modifier = Modifier.testTag("btn_prev_year")
                         ) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Tahun Sebelumnya", tint = RoyalBlue)
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Tahun Sebelumnya", tint = NokiaCyanDark)
                         }
 
                         Text(
                             text = "$selectedYear",
                             style = MaterialTheme.typography.titleLarge.copy(
                                 fontWeight = FontWeight.ExtraBold,
-                                color = RoyalBlue
+                                color = NokiaTextPrimary
                             )
                         )
 
@@ -122,7 +123,7 @@ fun MonthYearPickerDialog(
                             onClick = { selectedYear++ },
                             modifier = Modifier.testTag("btn_next_year")
                         ) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "Tahun Berikutnya", tint = RoyalBlue)
+                            Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "Tahun Berikutnya", tint = NokiaCyanDark)
                         }
                     }
                 }
@@ -133,8 +134,8 @@ fun MonthYearPickerDialog(
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(3),
                     modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     itemsIndexed(monthNames) { index, name ->
                         val isSelected = index == selectedMonthIndex
@@ -146,12 +147,23 @@ fun MonthYearPickerDialog(
                         }
 
                         Surface(
-                            shape = RoundedCornerShape(10.dp),
-                            color = if (isSelected) RoyalBlue else if (isCurrentMonthOfSystem) RoyalBlueLight else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
-                            border = if (isSelected) null else if (isCurrentMonthOfSystem) BorderStroke(1.dp, RoyalBlue) else null,
+                            shape = RoundedCornerShape(12.dp),
+                            color = when {
+                                isSelected -> NokiaCyan
+                                isCurrentMonthOfSystem -> NokiaCyanLight
+                                else -> NokiaCardSurfaceVariant
+                            },
+                            border = BorderStroke(
+                                width = if (isSelected) 1.5.dp else 1.dp,
+                                color = when {
+                                    isSelected -> NokiaCyanDark
+                                    isCurrentMonthOfSystem -> NokiaCyan
+                                    else -> NokiaBorder
+                                }
+                            ),
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(44.dp)
+                                .height(46.dp)
                                 .clickable {
                                     selectedMonthIndex = index
                                 }
@@ -162,10 +174,15 @@ fun MonthYearPickerDialog(
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
-                                    text = name.take(3),
+                                    text = name,
                                     style = MaterialTheme.typography.bodyMedium.copy(
-                                        fontWeight = if (isSelected || isCurrentMonthOfSystem) FontWeight.Bold else FontWeight.Medium,
-                                        color = if (isSelected) Color.White else if (isCurrentMonthOfSystem) RoyalBlue else MaterialTheme.colorScheme.onSurface
+                                        fontWeight = if (isSelected || isCurrentMonthOfSystem) FontWeight.ExtraBold else FontWeight.Bold,
+                                        color = when {
+                                            isSelected -> Color.White
+                                            isCurrentMonthOfSystem -> NokiaCyanDark
+                                            else -> NokiaTextPrimary
+                                        },
+                                        fontSize = 13.sp
                                     )
                                 )
                             }
@@ -177,8 +194,9 @@ fun MonthYearPickerDialog(
 
                 // Summary of working days
                 Surface(
-                    shape = RoundedCornerShape(10.dp),
-                    color = RoyalBlueLight.copy(alpha = 0.6f),
+                    shape = RoundedCornerShape(12.dp),
+                    color = NokiaCyanLight.copy(alpha = 0.7f),
+                    border = BorderStroke(1.dp, NokiaCyan.copy(alpha = 0.3f)),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Row(
@@ -188,8 +206,8 @@ fun MonthYearPickerDialog(
                         Text(
                             text = "💡 Terpilih: ${monthNames[selectedMonthIndex]} $selectedYear (~$weekdaysCount hari kerja)",
                             style = MaterialTheme.typography.bodySmall.copy(
-                                fontWeight = FontWeight.SemiBold,
-                                color = DeepNavy
+                                fontWeight = FontWeight.Bold,
+                                color = NokiaNavy
                             )
                         )
                     }
@@ -204,10 +222,12 @@ fun MonthYearPickerDialog(
                 ) {
                     OutlinedButton(
                         onClick = onDismiss,
-                        modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(10.dp)
+                        modifier = Modifier.weight(1f).height(48.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        border = BorderStroke(1.dp, NokiaBorder),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = NokiaTextSecondary)
                     ) {
-                        Text("Batal")
+                        Text("Batal", fontWeight = FontWeight.Bold)
                     }
 
                     Button(
@@ -218,9 +238,11 @@ fun MonthYearPickerDialog(
                         },
                         modifier = Modifier
                             .weight(1.3f)
+                            .height(48.dp)
                             .testTag("btn_confirm_month_selection"),
-                        shape = RoundedCornerShape(10.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = RoyalBlue)
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = NokiaCyan, contentColor = Color.White),
+                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp)
                     ) {
                         Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(16.dp))
                         Spacer(modifier = Modifier.width(4.dp))

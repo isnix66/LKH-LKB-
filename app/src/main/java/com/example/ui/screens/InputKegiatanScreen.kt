@@ -2,24 +2,31 @@ package com.example.ui.screens
 
 import android.app.DatePickerDialog
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Celebration
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.CloudUpload
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.FlashOn
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.PlaylistAdd
 import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.Today
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -37,10 +44,7 @@ import com.example.ui.components.EditKegiatanModal
 import com.example.ui.components.JadwalModal
 import com.example.ui.components.MonthYearPickerDialog
 import com.example.ui.components.SectionHeader
-import com.example.ui.theme.DeepNavy
-import com.example.ui.theme.EmeraldSuccess
-import com.example.ui.theme.RoyalBlue
-import com.example.ui.theme.RoyalBlueLight
+import com.example.ui.theme.*
 import com.example.util.DateUtils
 import java.util.Calendar
 
@@ -93,30 +97,47 @@ fun InputKegiatanScreen(
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
+            .background(NokiaBackground)
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         item {
-            SectionHeader(title = "📝 Input Kegiatan Harian")
+            SectionHeader(title = "📝 Input Kegiatan Harian & Bulanan")
         }
 
         // Form Card
         item {
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(containerColor = NokiaCardSurface),
+                border = BorderStroke(1.5.dp, NokiaCyan.copy(alpha = 0.35f)),
+                elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
             ) {
-                Column(modifier = Modifier.padding(16.dp)) {
+                Column(modifier = Modifier.padding(18.dp)) {
                     // 1. TANGGAL KEGIATAN
-                    Text(
-                        text = "📅 Tanggal Kegiatan",
-                        style = MaterialTheme.typography.labelSmall,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Surface(
+                            shape = RoundedCornerShape(8.dp),
+                            color = NokiaNavy,
+                            border = BorderStroke(1.dp, NokiaCyanGlow),
+                            modifier = Modifier.size(32.dp)
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Icon(Icons.Default.Today, contentDescription = null, tint = NokiaCyanGlow, modifier = Modifier.size(18.dp))
+                            }
+                        }
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Text(
+                            text = "Tanggal Kegiatan",
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = NokiaTextPrimary,
+                                fontSize = 15.sp
+                            )
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -130,46 +151,56 @@ fun InputKegiatanScreen(
                             modifier = Modifier
                                 .weight(1f)
                                 .testTag("field_tanggal_kegiatan"),
-                            shape = RoundedCornerShape(10.dp),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = NokiaCyan,
+                                unfocusedBorderColor = NokiaBorder,
+                                focusedTextColor = NokiaTextPrimary,
+                                unfocusedTextColor = NokiaTextPrimary
+                            ),
                             trailingIcon = {
                                 IconButton(onClick = { showDatePicker() }) {
-                                    Icon(Icons.Default.DateRange, contentDescription = "Pilih tanggal", tint = RoyalBlue)
+                                    Icon(Icons.Default.DateRange, contentDescription = "Pilih tanggal", tint = NokiaCyan)
                                 }
                             }
                         )
                         OutlinedButton(
                             onClick = { inputTanggal = DateUtils.getTodayIso() },
-                            shape = RoundedCornerShape(10.dp)
+                            shape = RoundedCornerShape(12.dp),
+                            border = BorderStroke(1.5.dp, NokiaCyan),
+                            colors = ButtonDefaults.outlinedButtonColors(contentColor = NokiaCyanDark)
                         ) {
-                            Text("Hari Ini")
+                            Text("Hari Ini", fontWeight = FontWeight.Bold)
                         }
                     }
 
                     // Show holiday warning on single date if applicable
                     val singleDayHolidayName = DateUtils.getHolidayName(inputTanggal)
                     if (singleDayHolidayName != null) {
-                        Spacer(modifier = Modifier.height(6.dp))
+                        Spacer(modifier = Modifier.height(8.dp))
                         Surface(
-                            shape = RoundedCornerShape(8.dp),
-                            color = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.7f),
+                            shape = RoundedCornerShape(10.dp),
+                            color = NokiaRedLight,
+                            border = BorderStroke(1.5.dp, NokiaRed.copy(alpha = 0.5f)),
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Row(
-                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Icon(
                                     Icons.Default.Celebration,
                                     contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.error,
-                                    modifier = Modifier.size(16.dp)
+                                    tint = NokiaRed,
+                                    modifier = Modifier.size(20.dp)
                                 )
-                                Spacer(modifier = Modifier.width(6.dp))
+                                Spacer(modifier = Modifier.width(8.dp))
                                 Text(
                                     text = "Hari Libur Nasional: $singleDayHolidayName",
-                                    style = MaterialTheme.typography.labelSmall.copy(
-                                        color = MaterialTheme.colorScheme.onErrorContainer,
-                                        fontWeight = FontWeight.Bold
+                                    style = MaterialTheme.typography.bodySmall.copy(
+                                        color = NokiaRedDark,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 13.sp
                                     )
                                 )
                             }
@@ -177,22 +208,40 @@ fun InputKegiatanScreen(
                     }
 
                     Spacer(modifier = Modifier.height(18.dp))
-                    HorizontalDivider()
+                    HorizontalDivider(color = NokiaBorder, thickness = 1.dp)
                     Spacer(modifier = Modifier.height(14.dp))
 
                     // 2. DAFTAR RINCIAN KEGIATAN MANUAL
-                    Text(
-                        text = "📄 Daftar Rincian Pekerjaan Manual",
-                        style = MaterialTheme.typography.titleSmall,
-                        fontWeight = FontWeight.Bold,
-                        color = DeepNavy
-                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Surface(
+                            shape = RoundedCornerShape(8.dp),
+                            color = NokiaNavy,
+                            border = BorderStroke(1.dp, NokiaCyanGlow),
+                            modifier = Modifier.size(32.dp)
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Icon(Icons.Default.PlaylistAdd, contentDescription = null, tint = NokiaCyanGlow, modifier = Modifier.size(18.dp))
+                            }
+                        }
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Text(
+                            text = "Daftar Rincian Pekerjaan Manual",
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = NokiaTextPrimary,
+                                fontSize = 15.sp
+                            )
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = "Tambahkan satu atau beberapa rincian pekerjaan untuk tanggal di atas.",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            color = NokiaTextSecondary,
+                            fontWeight = FontWeight.Medium
+                        )
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
 
                     DynamicTaskListEditor(
                         tasks = inputTaskList,
@@ -200,7 +249,7 @@ fun InputKegiatanScreen(
                         placeholder = "Ketik kegiatan harian..."
                     )
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(14.dp))
 
                     Button(
                         onClick = {
@@ -212,120 +261,170 @@ fun InputKegiatanScreen(
                         },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(48.dp)
+                            .height(50.dp)
                             .testTag("btn_simpan_ke_daftar"),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(14.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = NokiaCyan, contentColor = Color.White),
+                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 3.dp)
                     ) {
-                        Text("Simpan ke Daftar Pratinjau ➔", fontWeight = FontWeight.Bold)
+                        Icon(Icons.Default.CheckCircle, contentDescription = null, modifier = Modifier.size(20.dp))
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Simpan ke Daftar Pratinjau", fontWeight = FontWeight.Bold, fontSize = 15.sp)
                     }
 
                     Spacer(modifier = Modifier.height(20.dp))
-                    HorizontalDivider()
+                    HorizontalDivider(color = NokiaBorder, thickness = 1.dp)
                     Spacer(modifier = Modifier.height(16.dp))
 
                     // 3. BULAN OTOMATIS (ISI OTOMATIS BULANAN)
-                    Text(
-                        text = "📆 Isi Otomatis Bulanan (Pilih Bulan Saja)",
-                        style = MaterialTheme.typography.titleSmall,
-                        fontWeight = FontWeight.Bold,
-                        color = DeepNavy
-                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Surface(
+                            shape = RoundedCornerShape(8.dp),
+                            color = NokiaNavy,
+                            border = BorderStroke(1.dp, NokiaOrange),
+                            modifier = Modifier.size(32.dp)
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = NokiaOrange, modifier = Modifier.size(18.dp))
+                            }
+                        }
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Text(
+                            text = "Isi Otomatis Bulanan (Pilih Bulan Saja)",
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = NokiaTextPrimary,
+                                fontSize = 15.sp
+                            )
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = "Pilih bulan untuk otomatis membuat draft seluruh hari kerja dari jadwal rutin tanpa perlu klik tanggal satu per satu.",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            color = NokiaTextSecondary,
+                            fontWeight = FontWeight.Medium
+                        )
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
 
                     // Month picker field with direct dialog trigger
                     OutlinedTextField(
                         value = if (inputBulan.isNotBlank()) DateUtils.formatBulanText(inputBulan) else "",
                         onValueChange = { },
                         readOnly = true,
-                        label = { Text("Pilih Bulan") },
-                        placeholder = { Text("Contoh: Juni 2026") },
+                        label = { Text("Pilih Bulan", fontWeight = FontWeight.SemiBold) },
+                        placeholder = { Text("Contoh: Juni 2026", color = NokiaTextTertiary) },
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable { showMonthPickerModal = true }
                             .testTag("field_pilih_bulan_saja"),
-                        shape = RoundedCornerShape(10.dp),
+                        shape = RoundedCornerShape(12.dp),
                         singleLine = true,
                         leadingIcon = {
-                            Icon(Icons.Default.CalendarMonth, contentDescription = null, tint = RoyalBlue)
+                            Icon(Icons.Default.CalendarMonth, contentDescription = null, tint = NokiaCyan)
                         },
                         trailingIcon = {
                             IconButton(onClick = { showMonthPickerModal = true }) {
-                                Icon(Icons.Default.Edit, contentDescription = "Ubah Bulan", tint = RoyalBlue)
+                                Icon(Icons.Default.Edit, contentDescription = "Ubah Bulan", tint = NokiaCyan)
                             }
-                        }
+                        },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = NokiaCyan,
+                            unfocusedBorderColor = NokiaBorder,
+                            focusedTextColor = NokiaTextPrimary,
+                            unfocusedTextColor = NokiaTextPrimary,
+                            focusedLabelColor = NokiaCyanDark,
+                            unfocusedLabelColor = NokiaTextSecondary
+                        )
                     )
 
-                    Spacer(modifier = Modifier.height(10.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
 
                     // Switch for skipping national holidays
                     Surface(
-                        shape = RoundedCornerShape(10.dp),
-                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
+                        shape = RoundedCornerShape(14.dp),
+                        color = NokiaCardSurfaceVariant,
+                        border = BorderStroke(1.dp, NokiaBorder),
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 12.dp, vertical = 6.dp),
+                                .padding(horizontal = 14.dp, vertical = 10.dp),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(
                                     text = "Lewati Hari Libur Nasional",
-                                    style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)
+                                    style = MaterialTheme.typography.bodyMedium.copy(
+                                        fontWeight = FontWeight.Bold,
+                                        color = NokiaTextPrimary
+                                    )
                                 )
                                 Text(
                                     text = "Tidak memasukkan tanggal merah resmi ke dalam draf",
-                                    style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                    style = MaterialTheme.typography.bodySmall.copy(
+                                        color = NokiaTextSecondary,
+                                        fontWeight = FontWeight.Medium
+                                    )
                                 )
                             }
                             Switch(
                                 checked = skipNationalHolidays,
                                 onCheckedChange = { skipNationalHolidays = it },
-                                modifier = Modifier.testTag("switch_skip_holidays")
+                                modifier = Modifier.testTag("switch_skip_holidays"),
+                                colors = SwitchDefaults.colors(
+                                    checkedThumbColor = Color.White,
+                                    checkedTrackColor = NokiaLime,
+                                    uncheckedThumbColor = Color.White,
+                                    uncheckedTrackColor = NokiaBorder
+                                )
                             )
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(14.dp))
 
                     Button(
                         onClick = { onGenerateBulk(inputBulan, skipNationalHolidays) },
                         enabled = !isLoading && inputBulan.isNotBlank(),
-                        shape = RoundedCornerShape(10.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary),
+                        shape = RoundedCornerShape(14.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = NokiaOrange, contentColor = Color.White),
                         modifier = Modifier
                             .fillMaxWidth()
+                            .height(50.dp)
                             .testTag("btn_generate_bulk"),
-                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp)
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 10.dp),
+                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 3.dp)
                     ) {
-                        Icon(Icons.Default.FlashOn, contentDescription = null, modifier = Modifier.size(18.dp))
+                        Icon(Icons.Default.FlashOn, contentDescription = null, modifier = Modifier.size(20.dp))
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
                             "Buat Draft Otomatis Bulan ${DateUtils.formatBulanText(inputBulan)}",
-                            style = MaterialTheme.typography.labelLarge,
-                            fontWeight = FontWeight.SemiBold
+                            style = MaterialTheme.typography.labelLarge.copy(
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 14.5.sp
+                            )
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
 
                     OutlinedButton(
                         onClick = { showJadwalModal = true },
                         modifier = Modifier
                             .fillMaxWidth()
+                            .height(48.dp)
                             .testTag("btn_setup_jadwal"),
-                        shape = RoundedCornerShape(10.dp)
+                        shape = RoundedCornerShape(14.dp),
+                        border = BorderStroke(1.5.dp, NokiaCyan.copy(alpha = 0.5f)),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = NokiaCyanDark)
                     ) {
-                        Icon(Icons.Default.Schedule, contentDescription = null, modifier = Modifier.size(16.dp))
+                        Icon(Icons.Default.Schedule, contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text("📅 Atur Jadwal Rutin (${jadwalList.size} Jadwal Tersedia)")
+                        Text("📅 Atur Jadwal Rutin (${jadwalList.size} Jadwal Tersedia)", fontWeight = FontWeight.Bold)
                     }
                 }
             }
@@ -338,15 +437,16 @@ fun InputKegiatanScreen(
                     title = "📋 Daftar Pratinjau Draft (${draftEntries.size} Hari)",
                     trailingContent = {
                         Surface(
-                            shape = RoundedCornerShape(12.dp),
-                            color = RoyalBlueLight
+                            shape = RoundedCornerShape(100.dp),
+                            color = NokiaCyanLight,
+                            border = BorderStroke(1.dp, NokiaCyan.copy(alpha = 0.4f))
                         ) {
                             Text(
                                 text = "Draft Belum Disimpan",
-                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
                                 style = MaterialTheme.typography.labelSmall.copy(
                                     fontWeight = FontWeight.Bold,
-                                    color = RoyalBlue
+                                    color = NokiaCyanDark
                                 )
                             )
                         }
@@ -359,13 +459,14 @@ fun InputKegiatanScreen(
                 item {
                     Card(
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.5f))
+                        shape = RoundedCornerShape(16.dp),
+                        colors = CardDefaults.cardColors(containerColor = NokiaRedLight),
+                        border = BorderStroke(1.5.dp, NokiaRed.copy(alpha = 0.5f))
                     ) {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(12.dp),
+                                .padding(14.dp),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
@@ -376,24 +477,25 @@ fun InputKegiatanScreen(
                                 Icon(
                                     Icons.Default.Celebration,
                                     contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.error,
-                                    modifier = Modifier.size(20.dp)
+                                    tint = NokiaRed,
+                                    modifier = Modifier.size(22.dp)
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
                                     text = "Terdapat ${holidayEntriesInDraft.size} tanggal hari libur nasional di dalam draf.",
                                     style = MaterialTheme.typography.bodySmall.copy(
                                         fontWeight = FontWeight.Bold,
-                                        color = MaterialTheme.colorScheme.onErrorContainer
+                                        color = NokiaRedDark,
+                                        fontSize = 13.sp
                                     )
                                 )
                             }
 
                             Button(
                                 onClick = onRemoveHolidayEntries,
-                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
-                                shape = RoundedCornerShape(8.dp),
-                                contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp),
+                                colors = ButtonDefaults.buttonColors(containerColor = NokiaRed, contentColor = Color.White),
+                                shape = RoundedCornerShape(10.dp),
+                                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
                                 modifier = Modifier.testTag("btn_purge_holidays")
                             ) {
                                 Icon(Icons.Default.DeleteSweep, contentDescription = null, modifier = Modifier.size(16.dp))
@@ -411,11 +513,11 @@ fun InputKegiatanScreen(
 
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(14.dp),
+                    shape = RoundedCornerShape(16.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = if (isHoliday) MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.25f) else MaterialTheme.colorScheme.surface
+                        containerColor = if (isHoliday) NokiaRedLight else NokiaCardSurface
                     ),
-                    border = if (isHoliday) androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.error.copy(alpha = 0.5f)) else null,
+                    border = BorderStroke(1.5.dp, if (isHoliday) NokiaRed.copy(alpha = 0.6f) else NokiaCyan.copy(alpha = 0.3f)),
                     elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                 ) {
                     Column(modifier = Modifier.padding(14.dp)) {
@@ -429,33 +531,37 @@ fun InputKegiatanScreen(
                                 modifier = Modifier.weight(1f)
                             ) {
                                 Surface(
-                                    shape = RoundedCornerShape(6.dp),
-                                    color = if (isHoliday) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.surfaceVariant
+                                    shape = RoundedCornerShape(8.dp),
+                                    color = if (isHoliday) NokiaRed else NokiaNavy,
+                                    border = BorderStroke(1.dp, if (isHoliday) NokiaRed else NokiaCyanGlow),
+                                    modifier = Modifier.size(28.dp)
                                 ) {
-                                    Text(
-                                        text = "${index + 1}",
-                                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
-                                        style = MaterialTheme.typography.labelMedium.copy(
-                                            fontWeight = FontWeight.Bold,
-                                            color = if (isHoliday) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
+                                    Box(contentAlignment = Alignment.Center) {
+                                        Text(
+                                            text = "${index + 1}",
+                                            style = MaterialTheme.typography.labelSmall.copy(
+                                                fontWeight = FontWeight.Bold,
+                                                color = if (isHoliday) Color.White else NokiaCyanGlow
+                                            )
                                         )
-                                    )
+                                    }
                                 }
-                                Spacer(modifier = Modifier.width(8.dp))
+                                Spacer(modifier = Modifier.width(10.dp))
                                 Column {
                                     Text(
                                         text = "${DateUtils.formatTanggalIndo(entry.tanggal)}  (${DateUtils.getDayNameFromIso(entry.tanggal)})",
                                         style = MaterialTheme.typography.titleSmall.copy(
                                             fontWeight = FontWeight.Bold,
-                                            color = if (isHoliday) MaterialTheme.colorScheme.error else DeepNavy
+                                            color = if (isHoliday) NokiaRedDark else NokiaTextPrimary,
+                                            fontSize = 14.sp
                                         )
                                     )
                                     if (holidayName != null) {
                                         Text(
                                             text = "🎉 Libur: $holidayName",
                                             style = MaterialTheme.typography.labelSmall.copy(
-                                                fontWeight = FontWeight.ExtraBold,
-                                                color = MaterialTheme.colorScheme.error
+                                                fontWeight = FontWeight.Bold,
+                                                color = NokiaRedDark
                                             )
                                         )
                                     }
@@ -465,23 +571,23 @@ fun InputKegiatanScreen(
                             Row {
                                 IconButton(
                                     onClick = { editDraftIndex = index },
-                                    modifier = Modifier.size(36.dp)
+                                    modifier = Modifier.size(34.dp)
                                 ) {
                                     Icon(
                                         Icons.Default.Edit,
                                         contentDescription = "Edit Draft",
-                                        tint = RoyalBlue,
+                                        tint = NokiaCyanDark,
                                         modifier = Modifier.size(18.dp)
                                     )
                                 }
                                 IconButton(
                                     onClick = { onDeleteDraftRow(index) },
-                                    modifier = Modifier.size(36.dp)
+                                    modifier = Modifier.size(34.dp)
                                 ) {
                                     Icon(
                                         Icons.Default.Delete,
                                         contentDescription = "Hapus Baris",
-                                        tint = MaterialTheme.colorScheme.error,
+                                        tint = NokiaRed,
                                         modifier = Modifier.size(18.dp)
                                     )
                                 }
@@ -499,23 +605,29 @@ fun InputKegiatanScreen(
                             ) {
                                 Text(
                                     text = "${itemIdx + 1}.",
-                                    style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold),
+                                    style = MaterialTheme.typography.bodySmall.copy(
+                                        fontWeight = FontWeight.Bold,
+                                        color = NokiaCyanDark
+                                    ),
                                     modifier = Modifier.width(22.dp)
                                 )
                                 Text(
                                     text = task,
-                                    style = MaterialTheme.typography.bodySmall,
+                                    style = MaterialTheme.typography.bodySmall.copy(
+                                        color = NokiaTextPrimary,
+                                        fontWeight = FontWeight.Medium
+                                    ),
                                     modifier = Modifier.weight(1f)
                                 )
                                 IconButton(
                                     onClick = { onRemoveDraftItem(index, itemIdx) },
-                                    modifier = Modifier.size(28.dp)
+                                    modifier = Modifier.size(26.dp)
                                 ) {
                                     Icon(
                                         Icons.Default.Close,
                                         contentDescription = "Hapus item ini",
-                                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        modifier = Modifier.size(16.dp)
+                                        tint = NokiaTextTertiary,
+                                        modifier = Modifier.size(14.dp)
                                     )
                                 }
                             }
@@ -533,11 +645,13 @@ fun InputKegiatanScreen(
                         onClick = onClearDraft,
                         modifier = Modifier
                             .weight(1f)
-                            .height(48.dp)
+                            .height(50.dp)
                             .testTag("btn_batal_bulk"),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(14.dp),
+                        border = BorderStroke(1.5.dp, NokiaBorder),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = NokiaTextSecondary)
                     ) {
-                        Text("Batalkan Draf")
+                        Text("Batalkan Draf", fontWeight = FontWeight.Bold)
                     }
 
                     Button(
@@ -545,12 +659,15 @@ fun InputKegiatanScreen(
                         enabled = !isLoading,
                         modifier = Modifier
                             .weight(1.5f)
-                            .height(48.dp)
+                            .height(50.dp)
                             .testTag("btn_simpan_bulk_permanen"),
-                        colors = ButtonDefaults.buttonColors(containerColor = EmeraldSuccess),
-                        shape = RoundedCornerShape(12.dp)
+                        colors = ButtonDefaults.buttonColors(containerColor = NokiaLime, contentColor = Color.White),
+                        shape = RoundedCornerShape(14.dp),
+                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 3.dp)
                     ) {
-                        Text("Simpan Permanen ke Sheets", fontWeight = FontWeight.Bold)
+                        Icon(Icons.Default.CloudUpload, contentDescription = null, modifier = Modifier.size(20.dp))
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text("Simpan ke Sheets", fontWeight = FontWeight.Bold, fontSize = 14.5.sp)
                     }
                 }
             }
@@ -589,4 +706,5 @@ fun InputKegiatanScreen(
         )
     }
 }
+
 

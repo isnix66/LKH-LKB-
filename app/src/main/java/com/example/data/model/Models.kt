@@ -53,7 +53,10 @@ data class UserAccount(
     val spreadsheetUrl: String = "",
     val spreadsheetId: String = "",
     val expireDate: String = "" // Added expiration date (e.g. YYYY-MM-DD or empty for unlimited)
-)
+) {
+    val isAdmin: Boolean
+        get() = role.equals("admin", ignoreCase = true)
+}
 
 data class MonthRekap(
     val kegiatan: String,
