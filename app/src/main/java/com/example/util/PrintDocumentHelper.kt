@@ -59,22 +59,13 @@ object PrintDocumentHelper {
         selectedBulanFilter: String,
         logoBase64: String?
     ): String {
-        val strBulanTahun = if (selectedBulanFilter.isNotBlank()) {
-            DateUtils.formatBulanText(selectedBulanFilter).uppercase(Locale.getDefault())
-        } else {
-            "BULAN INI"
-        }
-
-        var targetYear = 2025
-        var targetMonthIndex = 0
-        if (selectedBulanFilter.isNotBlank()) {
-            val parts = selectedBulanFilter.split("-")
-            if (parts.size == 2) {
-                targetYear = parts[0].toIntOrNull() ?: 2025
-                targetMonthIndex = (parts[1].toIntOrNull() ?: 1) - 1
-            }
-        }
-
+        val (targetYear, targetMonthIndex) = DateUtils.resolveYearAndMonth(
+            selectedBulanFilter,
+            dataKegiatan.map { it.tanggal }
+        )
+        val strBulanTahun = DateUtils.formatBulanText(
+            String.format(Locale.US, "%04d-%02d", targetYear, targetMonthIndex + 1)
+        ).uppercase(Locale.getDefault())
         val tanggalCetak = DateUtils.getWorkingEndMonthDate(targetYear, targetMonthIndex)
         val currentLogoSrc = if (!logoBase64.isNullOrBlank()) {
             "data:image/png;base64,$logoBase64"
@@ -283,21 +274,13 @@ object PrintDocumentHelper {
         val tfBold = Typeface.create(Typeface.SERIF, Typeface.BOLD)
         val tfNormal = Typeface.create(Typeface.SERIF, Typeface.NORMAL)
 
-        val strBulanTahun = if (selectedBulanFilter.isNotBlank()) {
-            DateUtils.formatBulanText(selectedBulanFilter).uppercase(Locale.getDefault())
-        } else {
-            "BULAN INI"
-        }
-
-        var targetYear = 2025
-        var targetMonthIndex = 0
-        if (selectedBulanFilter.isNotBlank()) {
-            val parts = selectedBulanFilter.split("-")
-            if (parts.size == 2) {
-                targetYear = parts[0].toIntOrNull() ?: 2025
-                targetMonthIndex = (parts[1].toIntOrNull() ?: 1) - 1
-            }
-        }
+        val (targetYear, targetMonthIndex) = DateUtils.resolveYearAndMonth(
+            selectedBulanFilter,
+            dataKegiatan.map { it.tanggal }
+        )
+        val strBulanTahun = DateUtils.formatBulanText(
+            String.format(Locale.US, "%04d-%02d", targetYear, targetMonthIndex + 1)
+        ).uppercase(Locale.getDefault())
         val tanggalCetak = DateUtils.getWorkingEndMonthDate(targetYear, targetMonthIndex)
         var pageCounter = 1
 

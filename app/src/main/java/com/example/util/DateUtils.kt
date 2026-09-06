@@ -163,6 +163,38 @@ object DateUtils {
         }
     }
 
+    fun resolveYearAndMonth(
+        selectedBulan: String,
+        dataKegiatanDates: List<String> = emptyList()
+    ): Pair<Int, Int> {
+        if (selectedBulan.isNotBlank()) {
+            val parts = selectedBulan.trim().split("-")
+            if (parts.size == 2) {
+                val y = parts[0].toIntOrNull()
+                val m = parts[1].toIntOrNull()
+                if (y != null && m != null && m in 1..12) {
+                    return Pair(y, m - 1)
+                }
+            }
+        }
+
+        for (dStr in dataKegiatanDates) {
+            if (dStr.isNotBlank()) {
+                val parts = dStr.trim().split("-")
+                if (parts.size >= 2) {
+                    val y = parts[0].toIntOrNull()
+                    val m = parts[1].toIntOrNull()
+                    if (y != null && m != null && m in 1..12) {
+                        return Pair(y, m - 1)
+                    }
+                }
+            }
+        }
+
+        val cal = Calendar.getInstance()
+        return Pair(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH))
+    }
+
     fun getWorkingEndMonthDate(year: Int, monthIndex: Int): String {
         val cal = Calendar.getInstance()
         cal.set(Calendar.YEAR, year)

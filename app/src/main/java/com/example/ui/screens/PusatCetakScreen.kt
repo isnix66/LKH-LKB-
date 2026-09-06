@@ -504,21 +504,12 @@ private fun NativeDocumentSheetView(
     selectedBulan: String,
     customLogoBitmap: androidx.compose.ui.graphics.ImageBitmap?
 ) {
-    val strBulanTahun = if (selectedBulan.isNotBlank()) {
-        DateUtils.formatBulanText(selectedBulan).uppercase(Locale.getDefault())
-    } else {
-        "BULAN INI"
+    val (targetYear, targetMonthIndex) = remember(selectedBulan, dataKegiatan) {
+        DateUtils.resolveYearAndMonth(selectedBulan, dataKegiatan.map { it.tanggal })
     }
-
-    var targetYear = 2025
-    var targetMonthIndex = 0
-    if (selectedBulan.isNotBlank()) {
-        val parts = selectedBulan.split("-")
-        if (parts.size == 2) {
-            targetYear = parts[0].toIntOrNull() ?: 2025
-            targetMonthIndex = (parts[1].toIntOrNull() ?: 1) - 1
-        }
-    }
+    val strBulanTahun = DateUtils.formatBulanText(
+        String.format(Locale.US, "%04d-%02d", targetYear, targetMonthIndex + 1)
+    ).uppercase(Locale.getDefault())
     val tanggalCetak = DateUtils.getWorkingEndMonthDate(targetYear, targetMonthIndex)
 
     when (type) {
