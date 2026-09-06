@@ -80,7 +80,7 @@ object PrintDocumentHelper {
                     <td align="center">
                         <div style="font-size:16pt; font-weight:bold;">KEMENTERIAN AGAMA REPUBLIK INDONESIA</div>
                         <div style="font-size:14pt; font-weight:bold;">KANTOR KEMENTERIAN AGAMA KABUPATEN GARUT</div>
-                        <div style="font-size:14pt; font-weight:bold;">${profile.pegSatker.uppercase(Locale.getDefault())}</div>
+                        <div style="font-size: min(14pt, 2.8vw); font-weight:bold; white-space: nowrap; overflow: hidden;">${profile.pegSatker.uppercase(Locale.getDefault())}</div>
                         <div style="font-size:11pt;">Jalan Raya Wanakerta No.28 Cibatu-Garut 44185</div>
                         <div style="font-size:11pt;">Telepon (0262) 2860000 Email: mtsn1cibatu@yahoo.co.id</div>
                     </td>
@@ -110,10 +110,10 @@ object PrintDocumentHelper {
                         <tr><td width="160">NAMA</td><td>: <b>${profile.pegNama}</b></td></tr>
                         <tr><td>NIP</td><td>: ${profile.pegNIP}</td></tr>
                         <tr><td>JABATAN</td><td>: ${profile.pegJabatan.uppercase(Locale.getDefault())}</td></tr>
-                        <tr><td>SATUAN KERJA</td><td>: ${profile.pegSatker.uppercase(Locale.getDefault())}</td></tr>
+                        <tr><td>SATUAN KERJA</td><td style="white-space: nowrap; font-size: min(13pt, 2.6vw); overflow: hidden;">: ${profile.pegSatker.uppercase(Locale.getDefault())}</td></tr>
                     </table>
                     <h3 style="font-size:15pt; margin:0;">KEMENTERIAN AGAMA</h3>
-                    <h3 style="font-size:15pt; margin:0;">${profile.pegSatker.uppercase(Locale.getDefault())}</h3>
+                    <h3 style="font-size: min(15pt, 2.8vw); margin:0; white-space: nowrap; overflow: hidden;">${profile.pegSatker.uppercase(Locale.getDefault())}</h3>
                     <p style="font-size:11pt;">JL. Raya Wanakerta No. 28 Cibatu - Garut</p>
                 </div>
             """)
@@ -327,7 +327,7 @@ object PrintDocumentHelper {
         canvas.drawText("KEMENTERIAN AGAMA REPUBLIK INDONESIA", centerX, 44f, boldPaint)
         boldPaint.textSize = 11f
         canvas.drawText("KANTOR KEMENTERIAN AGAMA KABUPATEN GARUT", centerX, 58f, boldPaint)
-        canvas.drawText(satker.uppercase(Locale.getDefault()), centerX, 72f, boldPaint)
+        drawCanvasAutoFitText(canvas, satker.uppercase(Locale.getDefault()), centerX, 72f, boldPaint, targetSize = 11f, minSize = 3f, maxWidth = 450f)
         normPaint.textSize = 8f
         canvas.drawText("Jalan Raya Wanakerta No.28 Cibatu-Garut 44185", centerX, 84f, normPaint)
         canvas.drawText("Telepon (0262) 2860000 Email: mtsn1cibatu@yahoo.co.id", centerX, 94f, normPaint)
@@ -459,11 +459,8 @@ object PrintDocumentHelper {
         fun drawRow(label: String, value: String, isValBold: Boolean = false) {
             canvas.drawText(label, lx, rowY, labelPaint)
             canvas.drawText(":", vx - 12f, rowY, labelPaint)
-            if (isValBold) {
-                canvas.drawText(value, vx, rowY, labelPaint)
-            } else {
-                canvas.drawText(value, vx, rowY, valPaint)
-            }
+            val p = if (isValBold) labelPaint else valPaint
+            drawCanvasAutoFitText(canvas, value, vx, rowY, p, targetSize = 11f, minSize = 3f, maxWidth = boxRight - 20f - vx)
             rowY += 26f
         }
 
@@ -475,7 +472,7 @@ object PrintDocumentHelper {
         // Footer
         boldPaint.textSize = 13f
         canvas.drawText("KEMENTERIAN AGAMA", 595f / 2, 700f, boldPaint)
-        canvas.drawText(profile.pegSatker.uppercase(Locale.getDefault()), 595f / 2, 720f, boldPaint)
+        drawCanvasAutoFitText(canvas, profile.pegSatker.uppercase(Locale.getDefault()), 595f / 2, 720f, boldPaint, targetSize = 13f, minSize = 3f, maxWidth = 500f)
         normPaint.textSize = 9.5f
         canvas.drawText("JL. Raya Wanakerta No. 28 Cibatu - Garut", 595f / 2, 738f, normPaint)
 
@@ -874,6 +871,27 @@ object PrintDocumentHelper {
             e.printStackTrace()
             Toast.makeText(context, "Gagal membagikan PDF: ${e.message}", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun drawCanvasAutoFitText(
+        canvas: Canvas,
+        text: String,
+        x: Float,
+        y: Float,
+        paint: Paint,
+        targetSize: Float = 11f,
+        minSize: Float = 3f,
+        maxWidth: Float = 450f
+    ) {
+        val origSize = paint.textSize
+        var curSize = targetSize
+        paint.textSize = curSize
+        while (curSize > minSize && paint.measureText(text) > maxWidth) {
+            curSize -= 0.5f
+            paint.textSize = curSize
+        }
+        canvas.drawText(text, x, y, paint)
+        paint.textSize = origSize
     }
 
     fun printDocument(context: Context, docName: String, htmlContent: String) {

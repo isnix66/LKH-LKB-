@@ -12,14 +12,19 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ui.theme.*
@@ -129,13 +134,17 @@ fun SectionHeader(
     ) {
         Text(
             text = title,
+            modifier = Modifier.weight(1f, fill = false),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
             style = MaterialTheme.typography.titleMedium.copy(
                 fontWeight = FontWeight.Bold,
                 color = NokiaTextPrimary,
-                fontSize = 17.sp,
+                fontSize = 16.5.sp,
                 letterSpacing = (-0.2).sp
             )
         )
+        Spacer(modifier = Modifier.width(6.dp))
         trailingContent()
     }
 }
@@ -242,6 +251,54 @@ fun DynamicTaskListEditor(
             Text("Tambah Rincian Kegiatan", fontWeight = FontWeight.Bold, fontSize = 13.5.sp)
         }
     }
+}
+
+@Composable
+fun AutoFitText(
+    text: String,
+    modifier: Modifier = Modifier,
+    targetTextSize: TextUnit = 11.sp,
+    minTextSize: TextUnit = 3.sp,
+    fontWeight: FontWeight = FontWeight.Normal,
+    fontFamily: FontFamily = FontFamily.Default,
+    color: Color = Color.Unspecified,
+    textAlign: TextAlign = TextAlign.Start,
+    maxLines: Int = 1,
+    isBold: Boolean = false,
+    softWrap: Boolean = false
+) {
+    var resizedTextSize by remember(text, targetTextSize) { mutableStateOf(targetTextSize) }
+    var shouldDraw by remember(text, targetTextSize) { mutableStateOf(true) }
+
+    Text(
+        text = text,
+        modifier = modifier.drawWithContent {
+            if (shouldDraw) {
+                drawContent()
+            }
+        },
+        fontSize = resizedTextSize,
+        fontWeight = if (isBold) FontWeight.Bold else fontWeight,
+        fontFamily = fontFamily,
+        color = color,
+        textAlign = textAlign,
+        maxLines = maxLines,
+        softWrap = softWrap,
+        overflow = TextOverflow.Clip,
+        onTextLayout = { result ->
+            if (result.hasVisualOverflow && resizedTextSize > minTextSize) {
+                val nextSize = (resizedTextSize.value - 0.5f).sp
+                if (nextSize >= minTextSize) {
+                    shouldDraw = false
+                    resizedTextSize = nextSize
+                } else {
+                    shouldDraw = true
+                }
+            } else {
+                shouldDraw = true
+            }
+        }
+    )
 }
 
 

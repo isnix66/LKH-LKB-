@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.model.UserAccount
@@ -55,23 +56,29 @@ fun AdminScreen(
     ) {
         item {
             SectionHeader(
-                title = "⚙️ Manajemen Pengguna (Admin)",
+                title = "⚙️ Manajemen Pengguna",
                 trailingContent = {
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        IconButton(onClick = onRefresh) {
-                            Icon(Icons.Default.Refresh, contentDescription = "Refresh user", tint = NokiaCyanGlow)
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        IconButton(
+                            onClick = onRefresh,
+                            modifier = Modifier.size(36.dp)
+                        ) {
+                            Icon(Icons.Default.Refresh, contentDescription = "Refresh user", tint = NokiaCyanGlow, modifier = Modifier.size(20.dp))
                         }
                         Button(
                             onClick = { showAddModal = true },
-                            shape = RoundedCornerShape(12.dp),
+                            shape = RoundedCornerShape(10.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = NokiaCyan, contentColor = Color.White),
                             modifier = Modifier.testTag("btn_admin_add_user"),
-                            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
+                            contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp),
                             elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp)
                         ) {
                             Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text("Tambah User", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
+                            Text("Tambah User", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold, maxLines = 1)
                         }
                     }
                 }
@@ -113,38 +120,46 @@ fun AdminScreen(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp),
+                            .padding(12.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Row(modifier = Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
+                        Row(
+                            modifier = Modifier.weight(1f),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
                             Surface(
                                 shape = RoundedCornerShape(10.dp),
                                 color = if (isAdmin) NokiaOrangeLight else NokiaNavy,
                                 border = BorderStroke(1.dp, if (isAdmin) NokiaOrange else NokiaCyanGlow),
-                                modifier = Modifier.size(42.dp)
+                                modifier = Modifier.size(40.dp)
                             ) {
                                 Box(contentAlignment = Alignment.Center) {
                                     Icon(
                                         imageVector = if (isAdmin) Icons.Default.AdminPanelSettings else Icons.Default.Person,
                                         contentDescription = null,
                                         tint = if (isAdmin) NokiaOrangeDark else NokiaCyanGlow,
-                                        modifier = Modifier.size(24.dp)
+                                        modifier = Modifier.size(22.dp)
                                     )
                                 }
                             }
-                            Spacer(modifier = Modifier.width(12.dp))
-                            Column {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
+                            Spacer(modifier = Modifier.width(10.dp))
+                            Column(modifier = Modifier.weight(1f)) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                ) {
                                     Text(
                                         text = user.displayName.ifBlank { user.username },
+                                        modifier = Modifier.weight(1f, fill = false),
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
                                         style = MaterialTheme.typography.titleSmall.copy(
                                             fontWeight = FontWeight.Bold,
                                             color = NokiaTextPrimary,
-                                            fontSize = 15.sp
+                                            fontSize = 14.sp
                                         )
                                     )
-                                    Spacer(modifier = Modifier.width(8.dp))
                                     Surface(
                                         shape = RoundedCornerShape(100.dp),
                                         color = if (isAdmin) NokiaOrangeLight else NokiaCyanLight,
@@ -152,29 +167,37 @@ fun AdminScreen(
                                     ) {
                                         Text(
                                             text = user.role.uppercase(),
-                                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+                                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
                                             style = MaterialTheme.typography.labelSmall.copy(
                                                 fontWeight = FontWeight.Bold,
-                                                color = if (isAdmin) NokiaOrangeDark else NokiaCyanDark
-                                            )
+                                                color = if (isAdmin) NokiaOrangeDark else NokiaCyanDark,
+                                                fontSize = 10.sp
+                                            ),
+                                            maxLines = 1
                                         )
                                     }
                                 }
 
                                 Text(
                                     text = "Username: ${user.username}",
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
                                     style = MaterialTheme.typography.bodySmall.copy(
                                         color = NokiaTextSecondary,
-                                        fontWeight = FontWeight.Medium
+                                        fontWeight = FontWeight.Medium,
+                                        fontSize = 12.sp
                                     ),
                                     modifier = Modifier.padding(top = 2.dp)
                                 )
                                 if (user.expireDate.isNotBlank()) {
                                     Text(
                                         text = "Aktif s.d: ${user.expireDate}",
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
                                         style = MaterialTheme.typography.labelSmall.copy(
                                             color = NokiaRedDark,
-                                            fontWeight = FontWeight.Bold
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 11.sp
                                         ),
                                         modifier = Modifier.padding(top = 2.dp)
                                     )
@@ -190,22 +213,37 @@ fun AdminScreen(
                                                 e.printStackTrace()
                                             }
                                         },
-                                        contentPadding = PaddingValues(0.dp)
+                                        contentPadding = PaddingValues(0.dp),
+                                        modifier = Modifier.height(28.dp)
                                     ) {
-                                        Icon(Icons.Default.OpenInNew, contentDescription = null, modifier = Modifier.size(14.dp), tint = NokiaCyanDark)
+                                        Icon(Icons.Default.OpenInNew, contentDescription = null, modifier = Modifier.size(13.dp), tint = NokiaCyanDark)
                                         Spacer(modifier = Modifier.width(4.dp))
-                                        Text("Buka Spreadsheet", style = MaterialTheme.typography.labelSmall.copy(color = NokiaCyanDark, fontWeight = FontWeight.Bold))
+                                        Text(
+                                            "Buka Spreadsheet",
+                                            style = MaterialTheme.typography.labelSmall.copy(color = NokiaCyanDark, fontWeight = FontWeight.Bold, fontSize = 11.sp),
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis
+                                        )
                                     }
                                 }
                             }
                         }
 
-                        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                            IconButton(onClick = { userToEdit = user }) {
-                                Icon(Icons.Default.Edit, contentDescription = "Edit User", tint = NokiaCyanDark)
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(0.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            IconButton(
+                                onClick = { userToEdit = user },
+                                modifier = Modifier.size(34.dp)
+                            ) {
+                                Icon(Icons.Default.Edit, contentDescription = "Edit User", tint = NokiaCyanDark, modifier = Modifier.size(18.dp))
                             }
-                            IconButton(onClick = { userToDelete = user.username }) {
-                                Icon(Icons.Default.Delete, contentDescription = "Hapus User", tint = NokiaRed)
+                            IconButton(
+                                onClick = { userToDelete = user.username },
+                                modifier = Modifier.size(34.dp)
+                            ) {
+                                Icon(Icons.Default.Delete, contentDescription = "Hapus User", tint = NokiaRed, modifier = Modifier.size(18.dp))
                             }
                         }
                     }

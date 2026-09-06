@@ -26,6 +26,7 @@ data class LkhUiState(
     val userProfile: UserProfile = UserProfile(),
     val dataKegiatan: List<KegiatanEntry> = emptyList(),
     val draftEntries: List<KegiatanEntry> = emptyList(),
+    val manualDraftEntries: List<KegiatanEntry> = emptyList(),
     val daftarBulan: List<String> = emptyList(),
     val selectedBulan: String = "",
     val jadwalList: List<JadwalItem> = emptyList(),
@@ -271,12 +272,32 @@ class LkhViewModel(application: Application) : AndroidViewModel(application) {
         }
 
         val cleanTasks = tasks.map { it.trim() }.filter { it.isNotBlank() }
+        val currentManual = _uiState.value.manualDraftEntries.toMutableList()
+        val manualIndex = currentManual.indexOfFirst { it.tanggal == tanggal }
+
+        if (manualIndex != -1) {
+            val existing = currentManual[manualIndex]
+            val existingTasks = existing.items.map { it.trim() }.filter { it.isNotBlank() }
+            val combined = (existingTasks + cleanTasks).distinct()
+            currentManual[manualIndex] = existing.copy(kegiatan = combined.joinToString("\n"))
+        } else {
+            currentManual.add(
+                KegiatanEntry(
+                    no = currentManual.size + 1,
+                    tanggal = tanggal,
+                    kegiatan = cleanTasks.joinToString("\n")
+                )
+            )
+        }
+        currentManual.sortBy { it.tanggal }
+
         val currentDraft = _uiState.value.draftEntries.toMutableList()
         val existingIndex = currentDraft.indexOfFirst { it.tanggal == tanggal }
 
         if (existingIndex != -1) {
             val existing = currentDraft[existingIndex]
-            val combined = (existing.items + cleanTasks).distinct()
+            val existingTasks = existing.items.map { it.trim() }.filter { it.isNotBlank() }
+            val combined = (existingTasks + cleanTasks).distinct()
             currentDraft[existingIndex] = existing.copy(kegiatan = combined.joinToString("\n"))
         } else {
             currentDraft.add(
@@ -292,7 +313,8 @@ class LkhViewModel(application: Application) : AndroidViewModel(application) {
         _uiState.update {
             it.copy(
                 draftEntries = currentDraft,
-                infoMessage = "Item ditambahkan ke daftar pratinjau draft."
+                manualDraftEntries = currentManual,
+                infoMessage = "Kegiatan manual disimpan di daftar draf."
             )
         }
     }
@@ -305,13 +327,40 @@ class LkhViewModel(application: Application) : AndroidViewModel(application) {
             if (res.isSuccess) {
                 val newEntries = res.getOrThrow()
                 val currentDraft = _uiState.value.draftEntries.toMutableList()
-                currentDraft.addAll(newEntries)
+                val manualEntriesMap = _uiState.value.manualDraftEntries.associateBy { it.tanggal }
+
+                for (newEntry in newEntries) {
+                    val generatedTasks = newEntry.items.map { it.trim() }.filter { it.isNotBlank() }
+                    val existingIdx = currentDraft.indexOfFirst { it.tanggal == newEntry.tanggal }
+                    val manualForDate = manualEntriesMap[newEntry.tanggal]
+                    val manualTasks = manualForDate?.items?.map { it.trim() }?.filter { it.isNotBlank() } ?: emptyList()
+
+                    if (existingIdx != -1) {
+                        val existing = currentDraft[existingIdx]
+                        val existingTasks = existing.items.map { it.trim() }.filter { it.isNotBlank() }
+                        // Keep manual tasks at the bottom
+                        val combined = (generatedTasks + manualTasks + existingTasks).distinct()
+                        currentDraft[existingIdx] = existing.copy(kegiatan = combined.joinToString("\n"))
+                    } else {
+                        val savedInKegiatan = _uiState.value.dataKegiatan.find { it.tanggal == newEntry.tanggal }
+                        val savedTasks = savedInKegiatan?.items?.map { it.trim() }?.filter { it.isNotBlank() } ?: emptyList()
+                        val combined = (generatedTasks + manualTasks + savedTasks).distinct()
+                        currentDraft.add(
+                            KegiatanEntry(
+                                no = currentDraft.size + 1,
+                                tanggal = newEntry.tanggal,
+                                kegiatan = combined.joinToString("\n")
+                            )
+                        )
+                    }
+                }
+
                 currentDraft.sortBy { it.tanggal }
                 _uiState.update {
                     it.copy(
                         draftEntries = currentDraft,
                         isLoading = false,
-                        infoMessage = "Berhasil generate ${newEntries.size} hari kerja untuk bulan ${DateUtils.formatBulanText(bulanIso)}."
+                        infoMessage = "Berhasil generate ${newEntries.size} hari kerja untuk bulan ${DateUtils.formatBulanText(bulanIso)}. Kegiatan manual yang ada tetap dipertahankan."
                     )
                 }
             } else {
@@ -338,6 +387,7 @@ class LkhViewModel(application: Application) : AndroidViewModel(application) {
 
     fun removeDraftItem(draftIndex: Int, itemIndex: Int) {
         val currentDraft = _uiState.value.draftEntries.toMutableList()
+        val currentManual = _uiState.value.manualDraftEntries.toMutableList()
         if (draftIndex in currentDraft.indices) {
             val entry = currentDraft[draftIndex]
             val tasks = entry.items.toMutableList()
@@ -348,29 +398,59 @@ class LkhViewModel(application: Application) : AndroidViewModel(application) {
                 } else {
                     currentDraft[draftIndex] = entry.copy(kegiatan = tasks.joinToString("\n"))
                 }
-                _uiState.update { it.copy(draftEntries = currentDraft) }
+
+                // Also update manualDraftEntries if date matches
+                val manualIdx = currentManual.indexOfFirst { it.tanggal == entry.tanggal }
+                if (manualIdx != -1) {
+                    val mEntry = currentManual[manualIdx]
+                    val mTasks = mEntry.items.toMutableList()
+                    if (itemIndex in mTasks.indices) {
+                        mTasks.removeAt(itemIndex)
+                        if (mTasks.isEmpty()) {
+                            currentManual.removeAt(manualIdx)
+                        } else {
+                            currentManual[manualIdx] = mEntry.copy(kegiatan = mTasks.joinToString("\n"))
+                        }
+                    }
+                }
+
+                _uiState.update { it.copy(draftEntries = currentDraft, manualDraftEntries = currentManual) }
             }
         }
     }
 
     fun deleteDraftRow(draftIndex: Int) {
         val currentDraft = _uiState.value.draftEntries.toMutableList()
+        val currentManual = _uiState.value.manualDraftEntries.toMutableList()
         if (draftIndex in currentDraft.indices) {
-            currentDraft.removeAt(draftIndex)
-            _uiState.update { it.copy(draftEntries = currentDraft) }
+            val removed = currentDraft.removeAt(draftIndex)
+            currentManual.removeAll { it.tanggal == removed.tanggal }
+            _uiState.update { it.copy(draftEntries = currentDraft, manualDraftEntries = currentManual) }
         }
     }
 
     fun updateDraftRow(draftIndex: Int, newTasks: List<String>) {
         val currentDraft = _uiState.value.draftEntries.toMutableList()
+        val currentManual = _uiState.value.manualDraftEntries.toMutableList()
         if (draftIndex in currentDraft.indices) {
-            currentDraft[draftIndex] = currentDraft[draftIndex].copy(kegiatan = newTasks.joinToString("\n"))
-            _uiState.update { it.copy(draftEntries = currentDraft) }
+            val entry = currentDraft[draftIndex]
+            currentDraft[draftIndex] = entry.copy(kegiatan = newTasks.joinToString("\n"))
+            val manualIdx = currentManual.indexOfFirst { it.tanggal == entry.tanggal }
+            if (manualIdx != -1) {
+                currentManual[manualIdx] = currentManual[manualIdx].copy(kegiatan = newTasks.joinToString("\n"))
+            }
+            _uiState.update { it.copy(draftEntries = currentDraft, manualDraftEntries = currentManual) }
         }
     }
 
     fun clearDraft() {
-        _uiState.update { it.copy(draftEntries = emptyList(), infoMessage = "Draf dibatalkan.") }
+        val manualEntries = _uiState.value.manualDraftEntries
+        _uiState.update {
+            it.copy(
+                draftEntries = manualEntries,
+                infoMessage = if (manualEntries.isNotEmpty()) "Draf otomatis dibatalkan. Kegiatan manual yang di-input tetap dipertahankan." else "Draf dibatalkan."
+            )
+        }
     }
 
     fun saveDraftPermanently() {
@@ -388,6 +468,7 @@ class LkhViewModel(application: Application) : AndroidViewModel(application) {
             _uiState.update {
                 it.copy(
                     draftEntries = emptyList(),
+                    manualDraftEntries = emptyList(),
                     isLoading = false,
                     infoMessage = "$count data kegiatan berhasil disimpan permanen ke Google Sheets!"
                 )

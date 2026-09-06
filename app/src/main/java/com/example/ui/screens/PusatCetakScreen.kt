@@ -38,6 +38,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import com.example.ui.components.AutoFitText
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
@@ -150,11 +151,25 @@ fun PusatCetakScreen(
                             .testTag("btn_cetak_sampul"),
                         shape = RoundedCornerShape(14.dp),
                         border = BorderStroke(1.5.dp, NokiaCyan.copy(alpha = 0.5f)),
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = NokiaTextPrimary)
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = NokiaTextPrimary),
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
                     ) {
-                        Icon(Icons.Default.Description, contentDescription = null, modifier = Modifier.size(20.dp), tint = NokiaCyanDark)
-                        Spacer(modifier = Modifier.width(10.dp))
-                        Text("📄 1. Cetak Sampul Laporan Kinerja", fontWeight = FontWeight.Bold, color = NokiaTextPrimary)
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Start
+                        ) {
+                            Icon(Icons.Default.Description, contentDescription = null, modifier = Modifier.size(20.dp), tint = NokiaCyanDark)
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Text(
+                                text = "1. Cetak Sampul Laporan Kinerja",
+                                fontWeight = FontWeight.Bold,
+                                color = NokiaTextPrimary,
+                                fontSize = 14.sp,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
                     }
 
                     OutlinedButton(
@@ -166,11 +181,25 @@ fun PusatCetakScreen(
                             .testTag("btn_cetak_lkh"),
                         shape = RoundedCornerShape(14.dp),
                         border = BorderStroke(1.5.dp, NokiaCyan.copy(alpha = 0.5f)),
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = NokiaTextPrimary)
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = NokiaTextPrimary),
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
                     ) {
-                        Icon(Icons.Default.ViewList, contentDescription = null, modifier = Modifier.size(20.dp), tint = NokiaCyanDark)
-                        Spacer(modifier = Modifier.width(10.dp))
-                        Text("📋 2. Cetak LKH (Laporan Kerja Harian)", fontWeight = FontWeight.Bold, color = NokiaTextPrimary)
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Start
+                        ) {
+                            Icon(Icons.Default.ViewList, contentDescription = null, modifier = Modifier.size(20.dp), tint = NokiaCyanDark)
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Text(
+                                text = "2. Cetak LKH (Laporan Kerja Harian)",
+                                fontWeight = FontWeight.Bold,
+                                color = NokiaTextPrimary,
+                                fontSize = 14.sp,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
                     }
 
                     OutlinedButton(
@@ -182,11 +211,25 @@ fun PusatCetakScreen(
                             .testTag("btn_cetak_lkb"),
                         shape = RoundedCornerShape(14.dp),
                         border = BorderStroke(1.5.dp, NokiaCyan.copy(alpha = 0.5f)),
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = NokiaTextPrimary)
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = NokiaTextPrimary),
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
                     ) {
-                        Icon(Icons.Default.CalendarMonth, contentDescription = null, modifier = Modifier.size(20.dp), tint = NokiaCyanDark)
-                        Spacer(modifier = Modifier.width(10.dp))
-                        Text("📅 3. Cetak LKB (Laporan Kerja Bulanan)", fontWeight = FontWeight.Bold, color = NokiaTextPrimary)
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Start
+                        ) {
+                            Icon(Icons.Default.CalendarMonth, contentDescription = null, modifier = Modifier.size(20.dp), tint = NokiaCyanDark)
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Text(
+                                text = "3. Cetak LKB (Laporan Kerja Bulanan)",
+                                fontWeight = FontWeight.Bold,
+                                color = NokiaTextPrimary,
+                                fontSize = 14.sp,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
                     }
 
                     Button(
@@ -198,11 +241,24 @@ fun PusatCetakScreen(
                             .testTag("btn_cetak_semua"),
                         shape = RoundedCornerShape(14.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = NokiaCyan, contentColor = Color.White),
-                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 3.dp)
+                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 3.dp),
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
                     ) {
-                        Icon(Icons.Default.AutoStories, contentDescription = null, modifier = Modifier.size(20.dp))
-                        Spacer(modifier = Modifier.width(10.dp))
-                        Text("📚 Cetak Lengkap: Sampul + LKH + LKB", fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Start
+                        ) {
+                            Icon(Icons.Default.AutoStories, contentDescription = null, modifier = Modifier.size(20.dp))
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Text(
+                                text = "Cetak Lengkap: Sampul + LKH + LKB",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 14.5.sp,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
                     }
                 }
             }
@@ -605,13 +661,15 @@ private fun NativeKopSuratView(
                 textAlign = TextAlign.Center,
                 color = Color.Black
             )
-            Text(
+            AutoFitText(
                 text = satker.uppercase(Locale.getDefault()),
-                fontWeight = FontWeight.Bold,
-                fontSize = 11.sp,
+                targetTextSize = 11.sp,
+                minTextSize = 3.sp,
+                isBold = true,
                 fontFamily = FontFamily.Serif,
                 textAlign = TextAlign.Center,
-                color = Color.Black
+                color = Color.Black,
+                maxLines = 1
             )
             Text(
                 text = "Jalan Raya Wanakerta No.28 Cibatu-Garut 44185",
@@ -766,13 +824,15 @@ private fun NativeSampulSection(
             textAlign = TextAlign.Center,
             color = Color.Black
         )
-        Text(
+        AutoFitText(
             text = profile.pegSatker.uppercase(Locale.getDefault()),
-            fontWeight = FontWeight.Bold,
-            fontSize = 12.sp,
+            targetTextSize = 12.sp,
+            minTextSize = 3.sp,
+            isBold = true,
             fontFamily = FontFamily.Serif,
             textAlign = TextAlign.Center,
-            color = Color.Black
+            color = Color.Black,
+            maxLines = 1
         )
         Text(
             text = "JL. Raya Wanakerta No. 28 Cibatu - Garut",
@@ -810,15 +870,15 @@ private fun IdentitasRow(
             fontFamily = FontFamily.Serif,
             color = Color.Black
         )
-        Text(
+        AutoFitText(
             text = value,
             modifier = Modifier.weight(1f),
-            fontSize = fontSize,
-            fontWeight = if (isBold) FontWeight.Bold else FontWeight.Normal,
+            targetTextSize = fontSize,
+            minTextSize = 3.sp,
+            isBold = isBold,
             fontFamily = FontFamily.Serif,
             color = Color.Black,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
+            maxLines = 1
         )
     }
 }

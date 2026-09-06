@@ -573,7 +573,7 @@ fun ArsipKegiatanScreen(
                 ) {
                     Icon(Icons.Default.CloudUpload, contentDescription = null, modifier = Modifier.size(20.dp))
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Simpan Perubahan ke Google Sheets", fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                    Text("Simpan Perubahan ke Server", fontWeight = FontWeight.Bold, fontSize = 15.sp)
                 }
             }
         }

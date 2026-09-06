@@ -180,11 +180,17 @@ fun ProfilScreen(
                         value = pegSatker,
                         onValueChange = { pegSatker = it },
                         label = { Text("Satuan Kerja (Satker)", fontWeight = FontWeight.SemiBold) },
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag("input_peg_satker"),
                         shape = RoundedCornerShape(12.dp),
                         singleLine = false,
-                        minLines = 2,
                         maxLines = 3,
+                        textStyle = LocalTextStyle.current.copy(
+                            fontSize = 13.5.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = NokiaTextPrimary
+                        ),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = NokiaCyan,
                             unfocusedBorderColor = NokiaBorder,

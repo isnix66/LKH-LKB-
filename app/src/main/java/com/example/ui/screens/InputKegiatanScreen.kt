@@ -35,6 +35,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.model.JadwalItem
@@ -402,11 +403,13 @@ fun InputKegiatanScreen(
                         Icon(Icons.Default.FlashOn, contentDescription = null, modifier = Modifier.size(20.dp))
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
-                            "Buat Draft Otomatis Bulan ${DateUtils.formatBulanText(inputBulan)}",
+                            text = if (inputBulan.isNotBlank()) "Buat Draft Otomatis (${DateUtils.formatBulanText(inputBulan)})" else "Buat Draft Otomatis",
                             style = MaterialTheme.typography.labelLarge.copy(
                                 fontWeight = FontWeight.Bold,
-                                fontSize = 14.5.sp
-                            )
+                                fontSize = 13.5.sp
+                            ),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
 
@@ -424,7 +427,13 @@ fun InputKegiatanScreen(
                     ) {
                         Icon(Icons.Default.Schedule, contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text("📅 Atur Jadwal Rutin (${jadwalList.size} Jadwal Tersedia)", fontWeight = FontWeight.Bold)
+                        Text(
+                            text = "Atur Jadwal Rutin (${jadwalList.size} Jadwal)",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 13.5.sp,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
                     }
                 }
             }
@@ -667,7 +676,13 @@ fun InputKegiatanScreen(
                     ) {
                         Icon(Icons.Default.CloudUpload, contentDescription = null, modifier = Modifier.size(20.dp))
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text("Simpan ke Sheets", fontWeight = FontWeight.Bold, fontSize = 14.5.sp)
+                        Text(
+                            text = "Simpan",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 14.5.sp,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
                     }
                 }
             }
