@@ -266,6 +266,7 @@ fun MainScreen(
                         dataKegiatan = uiState.dataKegiatan,
                         selectedBulan = uiState.selectedBulan,
                         logoBase64 = uiState.logoBase64,
+                        jadwalList = uiState.jadwalList,
                         isLoading = uiState.isLoading,
                         onUploadLogo = { viewModel.uploadLogo(it) },
                         onDeleteLogo = { viewModel.deleteLogo() }

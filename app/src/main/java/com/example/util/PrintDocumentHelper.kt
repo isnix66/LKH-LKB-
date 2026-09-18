@@ -25,10 +25,12 @@ import android.util.Base64
 import android.widget.Toast
 import androidx.core.content.FileProvider
 import com.example.R
+import com.example.data.model.JadwalItem
 import com.example.data.model.KegiatanEntry
 import com.example.data.model.UserProfile
 import java.io.File
 import java.io.FileOutputStream
+import java.util.Calendar
 import java.util.Locale
 
 object PrintDocumentHelper {
@@ -57,7 +59,8 @@ object PrintDocumentHelper {
         profile: UserProfile,
         dataKegiatan: List<KegiatanEntry>,
         selectedBulanFilter: String,
-        logoBase64: String?
+        logoBase64: String?,
+        jadwalList: List<JadwalItem> = emptyList()
     ): String {
         val (targetYear, targetMonthIndex) = DateUtils.resolveYearAndMonth(
             selectedBulanFilter,
@@ -106,11 +109,11 @@ object PrintDocumentHelper {
                     <img src="$currentLogoSrc" style="height:120px; margin-bottom:20px;">
                     <h1 style="font-size:20pt; letter-spacing:1px; margin-bottom:10px;">LAPORAN KINERJA BULANAN</h1>
                     <h2 style="font-size:16pt; margin-bottom:25px;">APARATUR SIPIL NEGARA KEMENTERIAN AGAMA<br>BULAN $strBulanTahun</h2>
-                    <table style="margin:0 auto; font-size:13pt; text-align:left; margin-bottom:120px;">
-                        <tr><td width="160">NAMA</td><td>: <b>${profile.pegNama}</b></td></tr>
-                        <tr><td>NIP</td><td>: ${profile.pegNIP}</td></tr>
-                        <tr><td>JABATAN</td><td>: ${profile.pegJabatan.uppercase(Locale.getDefault())}</td></tr>
-                        <tr><td>SATUAN KERJA</td><td style="white-space: nowrap; font-size: min(13pt, 2.6vw); overflow: hidden;">: ${profile.pegSatker.uppercase(Locale.getDefault())}</td></tr>
+                    <table style="margin:0 auto; font-size:13pt; text-align:left; margin-bottom:120px; border-collapse:collapse;">
+                        <tr><td style="width:160px; font-weight:bold;">NAMA</td><td style="width:20px; text-align:center; font-weight:bold;">:</td><td><b>${profile.pegNama}</b></td></tr>
+                        <tr><td style="font-weight:bold;">NIP</td><td style="text-align:center; font-weight:bold;">:</td><td>${profile.pegNIP}</td></tr>
+                        <tr><td style="font-weight:bold;">JABATAN</td><td style="text-align:center; font-weight:bold;">:</td><td>${profile.pegJabatan.uppercase(Locale.getDefault())}</td></tr>
+                        <tr><td style="font-weight:bold;">SATUAN KERJA</td><td style="text-align:center; font-weight:bold;">:</td><td style="white-space: nowrap; font-size: min(13pt, 2.6vw); overflow: hidden;">${profile.pegSatker.uppercase(Locale.getDefault())}</td></tr>
                     </table>
                     <h3 style="font-size:15pt; margin:0;">KEMENTERIAN AGAMA</h3>
                     <h3 style="font-size: min(15pt, 2.8vw); margin:0; white-space: nowrap; overflow: hidden;">${profile.pegSatker.uppercase(Locale.getDefault())}</h3>
@@ -140,12 +143,12 @@ object PrintDocumentHelper {
             kontenHtml.append("""
                 <div style="font-family:'Times New Roman', Times, serif; font-size:12pt; padding:15px;">
                     <h2 style="text-align:center; font-size:16pt; margin-bottom:20px; text-decoration:underline;">Laporan Kerja</h2>
-                    <table style="width:100%; border:none; margin-bottom:15px;">
-                        <tr><td width="150">Nama</td><td>: ${profile.pegNama.uppercase(Locale.getDefault())}</td></tr>
-                        <tr><td>NIP</td><td>: ${profile.pegNIP}</td></tr>
-                        <tr><td>Jabatan</td><td>: ${profile.pegJabatan}</td></tr>
-                        <tr><td>Pangkat</td><td>: ${profile.pegPangkat}</td></tr>
-                        <tr><td>Golongan Ruang</td><td>: ${profile.pegGolongan}</td></tr>
+                    <table style="width:100%; border:none; border-collapse:collapse; margin-bottom:15px;">
+                        <tr><td style="width:140px; font-weight:bold;">Nama</td><td style="width:20px; text-align:center; font-weight:bold;">:</td><td><b>${profile.pegNama.uppercase(Locale.getDefault())}</b></td></tr>
+                        <tr><td style="font-weight:bold;">NIP</td><td style="text-align:center; font-weight:bold;">:</td><td>${profile.pegNIP}</td></tr>
+                        <tr><td style="font-weight:bold;">Jabatan</td><td style="text-align:center; font-weight:bold;">:</td><td>${profile.pegJabatan}</td></tr>
+                        <tr><td style="font-weight:bold;">Pangkat</td><td style="text-align:center; font-weight:bold;">:</td><td>${profile.pegPangkat}</td></tr>
+                        <tr><td style="font-weight:bold;">Golongan</td><td style="text-align:center; font-weight:bold;">:</td><td>${profile.pegGolongan}</td></tr>
                     </table>
                     <table border="1" cellpadding="8" style="width:100%; border-collapse:collapse; margin-bottom:20px;">
                         <thead>
@@ -170,30 +173,28 @@ object PrintDocumentHelper {
 
         // 3. LKB (Laporan Kerja Bulanan)
         if (type == "lkb" || type == "semua") {
-            val rekap = aggregateLkb(dataKegiatan)
+            val lkbItems = aggregateLkbItems(dataKegiatan, jadwalList)
             val lkbRows = StringBuilder()
             var index = 1
-            for ((key, count) in rekap) {
-                var volumeText = "Kegiatan"
-                var jumlah = count.toString()
-                if (key.contains("KBM", ignoreCase = true)) {
-                    volumeText = "Kegiatan"
-                    jumlah = "${count * 3} JP"
-                }
+            for (item in lkbItems) {
                 lkbRows.append("""
                     <tr>
                         <td align="center">$index</td>
-                        <td>$key</td>
-                        <td align="center">$jumlah</td>
-                        <td align="center">$volumeText</td>
+                        <td>${item.kegiatan}</td>
+                        <td align="center">${item.jumlah}</td>
+                        <td align="center">${item.satuan}</td>
                     </tr>
                 """.trimIndent())
                 index++
             }
 
+            if (lkbRows.isEmpty()) {
+                lkbRows.append("<tr><td colspan=\"4\" align=\"center\">Tidak ada kegiatan</td></tr>")
+            }
+
             kontenHtml.append("""
                 $kopSurat
-                <div style="font-family:'Times New Roman', Times, serif; font-size:12pt; padding:0 15px;">
+                <div style="font-family:'Times New Roman', Times, serif; font-size:12pt; padding:0 20px;">
                     <h2 style="text-align:center; font-size:14pt; margin-bottom:5px;">LAPORAN KERJA BULANAN</h2>
                     <h2 style="text-align:center; font-size:14pt; margin-top:0; margin-bottom:20px;">BULAN $strBulanTahun</h2>
                     <table style="width:100%; border:none; margin-bottom:15px;">
@@ -243,19 +244,289 @@ object PrintDocumentHelper {
         """.trimIndent()
     }
 
-    fun aggregateLkb(dataKegiatan: List<KegiatanEntry>): Map<String, Int> {
-        val rekap = mutableMapOf<String, Int>()
-        dataKegiatan.forEach { d ->
-            d.items.forEach { k ->
-                var text = k.trim()
-                if (text.contains("kbm 7", ignoreCase = true)) text = "KBM Kelas 7"
-                if (text.contains("kbm 8", ignoreCase = true)) text = "KBM Kelas 8"
-                if (text.contains("kbm 9", ignoreCase = true)) text = "KBM Kelas 9"
-                if (text.contains("upacara", ignoreCase = true)) text = "Upacara Bendera"
-                rekap[text] = (rekap[text] ?: 0) + 1
+    data class LkbRowItem(
+        val kegiatan: String,
+        val jumlah: String,
+        val satuan: String = "Kegiatan"
+    )
+
+    private fun resolveJumlahKelasForJenjang(
+        jenjang: Int,
+        jPattern: String,
+        allTeachingTexts: List<String>,
+        jadwalList: List<JadwalItem>,
+        dataKegiatan: List<KegiatanEntry>
+    ): Int {
+        // 1. Check for explicit count in parentheses, e.g. "Kelas 8 (6 Kelas)", "8 ( 6 )", "(6 kelas)", "KBM 8 (6)"
+        val parenRegex = Regex(
+            """(?:\b(?:kelas|kls|kbm|mengajar|pembelajaran)?\s*$jPattern\b[^(]*\(\s*(\d+)\s*(?:kelas|kls|rombel)?\s*\))|(?:\(\s*(\d+)\s*(?:kelas|kls|rombel)\s*\))|(?:\b$jPattern\b[^\d\n]*(\d+)\s*(?:kelas|rombel)\b)""",
+            RegexOption.IGNORE_CASE
+        )
+        var maxExplicitCount = 0
+        for (text in allTeachingTexts) {
+            val m = parenRegex.find(text)
+            if (m != null) {
+                val numStr = m.groupValues[1].ifEmpty { m.groupValues[2] }.ifEmpty { m.groupValues[3] }
+                val num = numStr.toIntOrNull() ?: 0
+                if (num > maxExplicitCount) maxExplicitCount = num
             }
         }
-        return rekap
+        if (maxExplicitCount > 0) return maxExplicitCount
+
+        // 2. Check for named classes (e.g. 8A, 8B, 8C, 8D, 8A - 8D, 8.1, 8.2)
+        val namedClasses = mutableSetOf<String>()
+        val rangeRegex = Regex(
+            """\b$jPattern\s*([A-La-l])\s*(?:-|s\.?d\.?|s/d|sampai)\s*(?:$jPattern\s*)?([A-La-l])\b""",
+            RegexOption.IGNORE_CASE
+        )
+        val letterRegex = Regex("""\b$jPattern\s*[-./]?\s*([A-La-l])\b""", RegexOption.IGNORE_CASE)
+        val numRegex = Regex("""\b$jPattern\s*[-./]\s*([1-9])\b""", RegexOption.IGNORE_CASE)
+        val listRegex = Regex(
+            """(?:kelas|kls|kbm)?\s*$jPattern\s*([A-La-l])?(?:[\s,]+(?:dan|&)?[\s,]*([A-La-l]))+""",
+            RegexOption.IGNORE_CASE
+        )
+
+        for (text in allTeachingTexts) {
+            for (rm in rangeRegex.findAll(text)) {
+                val startChar = rm.groupValues[1].uppercase().firstOrNull() ?: 'A'
+                val endChar = rm.groupValues[2].uppercase().firstOrNull() ?: 'A'
+                if (startChar in 'A'..'L' && endChar in 'A'..'L' && startChar <= endChar) {
+                    for (ch in startChar..endChar) {
+                        namedClasses.add("$jenjang$ch")
+                    }
+                }
+            }
+            for (m in letterRegex.findAll(text)) {
+                namedClasses.add("$jenjang${m.groupValues[1].uppercase()}")
+            }
+            for (m in numRegex.findAll(text)) {
+                namedClasses.add("$jenjang.${m.groupValues[1]}")
+            }
+            for (lm in listRegex.findAll(text)) {
+                val fullMatched = lm.value
+                val subLetters = Regex("""\b([A-La-l])\b""").findAll(fullMatched)
+                for (sl in subLetters) {
+                    namedClasses.add("$jenjang${sl.groupValues[1].uppercase()}")
+                }
+            }
+        }
+        if (namedClasses.isNotEmpty()) return namedClasses.size
+
+        // 3. Check count in routine schedule (jadwalList)
+        if (jadwalList.isNotEmpty()) {
+            var scheduleCount = 0
+            for (jItem in jadwalList) {
+                for (t in jItem.items) {
+                    val lower = t.lowercase()
+                    val isTeaching = lower.contains("kbm") || lower.contains("mengajar") ||
+                            lower.contains("pembelajaran") || lower.contains("tatap muka") || lower.contains("pbm")
+                    val isNonTeaching = (lower.contains("wali kelas") || lower.contains("rapat") ||
+                            lower.contains("piket") || lower.contains("bimbingan") ||
+                            lower.contains("konseling") || lower.contains("upacara") || lower.contains("apel")) && !isTeaching
+
+                    if (!isNonTeaching) {
+                        val hasMention = Regex("""(?:\b(?:kelas|kls|kbm|mengajar|pembelajaran)\s*$jPattern\b)|(?:\b$jPattern\s*[-./]?[A-La-l]\b)""", RegexOption.IGNORE_CASE).containsMatchIn(t) ||
+                                (isTeaching && Regex("""\b$jPattern\b""", RegexOption.IGNORE_CASE).containsMatchIn(t))
+                        if (hasMention) scheduleCount++
+                    }
+                }
+            }
+            if (scheduleCount > 0) return scheduleCount
+        }
+
+        // 4. Default fallback: for jenjang 7, 8, or 9, default to 6 classes (typical in MTs/SMP), otherwise 1
+        return if (jenjang in 7..9) 6 else 1
+    }
+
+    fun aggregateLkbItems(
+        dataKegiatan: List<KegiatanEntry>,
+        jadwalList: List<JadwalItem> = emptyList()
+    ): List<LkbRowItem> {
+        // Only MTs / SMP jenjang: Kelas 7, 8, 9
+        val supportedJenjang = listOf(7, 8, 9)
+        val romanMap = mapOf(
+            7 to "VII", 8 to "VIII", 9 to "IX"
+        )
+
+        val jenjangTeachingTexts = mutableMapOf<Int, MutableList<String>>()
+        val jenjangPertemuanCounts = mutableMapOf<Int, Int>()
+        val nonTeachingCounts = mutableMapOf<String, Int>()
+        val firstSeenOrder = mutableListOf<String>() // Key: "JENJANG:8" or "NON_TEACHING:Upacara Bendera"
+
+        fun isTeachingForJenjang(text: String, j: Int): Boolean {
+            val lower = text.lowercase()
+            val isExplicitTeaching = lower.contains("kbm") ||
+                    lower.contains("mengajar") ||
+                    lower.contains("pembelajaran") ||
+                    lower.contains("tatap muka") ||
+                    lower.contains("pbm")
+            val isNonTeaching = (lower.contains("wali kelas") ||
+                    lower.contains("rapat") ||
+                    lower.contains("piket") ||
+                    lower.contains("bimbingan") ||
+                    lower.contains("konseling") ||
+                    lower.contains("upacara") ||
+                    lower.contains("apel")) && !isExplicitTeaching
+            if (isNonTeaching) return false
+
+            val roman = romanMap[j] ?: ""
+            val jPattern = if (roman.isNotEmpty()) "(?:$j|$roman)" else "$j"
+            return Regex(
+                """(?:\b(?:kelas|kls|kbm|jenjang|mengajar|pembelajaran)\s*$jPattern\b)|(?:\b$jPattern\s*[-./]?[A-La-l]\b)|(?:\b$jPattern\s*[-./][1-9]\b)""",
+                RegexOption.IGNORE_CASE
+            ).containsMatchIn(text) || (isExplicitTeaching && Regex("""\b$jPattern\b""", RegexOption.IGNORE_CASE).containsMatchIn(text))
+        }
+
+        // Include text from jadwalList in jenjang teaching contexts
+        jadwalList.forEach { jItem ->
+            jItem.items.forEach { rawItem ->
+                val text = rawItem.trim()
+                if (text.isNotBlank()) {
+                    for (j in supportedJenjang) {
+                        if (isTeachingForJenjang(text, j)) {
+                            jenjangTeachingTexts.getOrPut(j) { mutableListOf() }.add(text)
+                        }
+                    }
+                }
+            }
+        }
+
+        fun countTeachingOccurrencesInText(text: String, j: Int, jPattern: String): Int {
+            // 1. Check for range, e.g. "8A - 8F", "8A s.d 8F", "8A s/d 8F", "Kelas 8A sampai 8F", "VIII A - VIII F"
+            val rangeRegex = Regex(
+                """\b$jPattern\s*[-./]?([A-La-l])\s*(?:-|s\.?d\.?|sampai|s/d)\s*(?:$jPattern\s*[-./]?)?([A-La-l])\b""",
+                RegexOption.IGNORE_CASE
+            )
+            val rangeMatch = rangeRegex.find(text)
+            if (rangeMatch != null) {
+                val startChar = rangeMatch.groupValues[1].uppercase()[0]
+                val endChar = rangeMatch.groupValues[2].uppercase()[0]
+                if (endChar >= startChar) {
+                    return (endChar - startChar + 1)
+                }
+            }
+
+            // 2. Check explicit count in parentheses, e.g. "Kelas 8 (6 Kelas)", "8 (6)"
+            val parenRegex = Regex(
+                """\b$jPattern\b[^(]*\(\s*(\d+)\s*(?:kelas|kls|rombel)?\s*\)""",
+                RegexOption.IGNORE_CASE
+            )
+            val parenMatch = parenRegex.find(text)
+            if (parenMatch != null) {
+                val num = parenMatch.groupValues[1].toIntOrNull() ?: 0
+                if (num in 1..15) return num
+            }
+
+            // 3. Check distinct class letters mentioned with jenjang prefix, e.g. "8A, 8B, 8C"
+            val classMatches = Regex(
+                """\b$jPattern\s*[-./]?([A-La-l])\b""",
+                RegexOption.IGNORE_CASE
+            ).findAll(text).map { it.groupValues[1].uppercase() }.toSet().size
+            if (classMatches > 1) {
+                return classMatches
+            }
+
+            // 4. Check list like "8A, B, C, D"
+            val listAfterPattern = Regex(
+                """\b$jPattern\s*[-./]?([A-La-l])((?:\s*,\s*[A-La-l])+)""",
+                RegexOption.IGNORE_CASE
+            ).find(text)
+            if (listAfterPattern != null) {
+                val rest = listAfterPattern.groupValues[2].split(",").map { it.trim() }.filter { it.length == 1 }
+                val total = 1 + rest.size
+                if (total > 1) return total
+            }
+
+            return 1
+        }
+
+        // Process dataKegiatan items
+        dataKegiatan.forEach { d ->
+            d.items.forEach { rawItem ->
+                var text = rawItem.trim()
+                if (text.isBlank()) return@forEach
+
+                var matchedAnyJenjang = false
+                for (j in supportedJenjang) {
+                    if (isTeachingForJenjang(text, j)) {
+                        matchedAnyJenjang = true
+                        jenjangTeachingTexts.getOrPut(j) { mutableListOf() }.add(text)
+
+                        val roman = romanMap[j] ?: ""
+                        val jPattern = if (roman.isNotEmpty()) "(?:$j|$roman)" else "$j"
+                        val countToAdd = countTeachingOccurrencesInText(text, j, jPattern)
+
+                        jenjangPertemuanCounts[j] = (jenjangPertemuanCounts[j] ?: 0) + countToAdd
+                        val key = "JENJANG:$j"
+                        if (!firstSeenOrder.contains(key)) {
+                            firstSeenOrder.add(key)
+                        }
+                    }
+                }
+
+                if (!matchedAnyJenjang) {
+                    val lower = text.lowercase()
+                    if (lower.contains("upacara")) {
+                        text = "Upacara Bendera"
+                    } else if (lower.contains("sholat dhuha")) {
+                        text = "Sholat Dhuha"
+                    } else if (lower.contains("sholat dzuhur") || lower.contains("sholat dhuhur")) {
+                        text = "Sholat Dzuhur Berjamaah"
+                    } else if (lower.contains("rapat")) {
+                        text = "Rapat Koordinasi"
+                    }
+                    val key = "NON_TEACHING:$text"
+                    nonTeachingCounts[text] = (nonTeachingCounts[text] ?: 0) + 1
+                    if (!firstSeenOrder.contains(key)) {
+                        firstSeenOrder.add(key)
+                    }
+                }
+            }
+        }
+
+        // Build result rows matching index.html:
+        // 1. All teaching grades sorted ascending first (e.g. Kelas 7, Kelas 8, Kelas 9)
+        // 2. All non-teaching activities following in order of appearance
+        val result = mutableListOf<LkbRowItem>()
+
+        val gradesSorted = jenjangPertemuanCounts.keys.sorted()
+        for (j in gradesSorted) {
+            val frekuensiPertemuan = jenjangPertemuanCounts[j] ?: 0
+            val totalJp = frekuensiPertemuan * 2
+            result.add(
+                LkbRowItem(
+                    kegiatan = "Kegiatan Belajar Mengajar Kelas $j",
+                    jumlah = "$totalJp JP",
+                    satuan = "Kegiatan"
+                )
+            )
+        }
+
+        for (itemKey in firstSeenOrder) {
+            if (itemKey.startsWith("NON_TEACHING:")) {
+                val taskName = itemKey.substringAfter("NON_TEACHING:")
+                val count = nonTeachingCounts[taskName] ?: 1
+                result.add(
+                    LkbRowItem(
+                        kegiatan = taskName,
+                        jumlah = count.toString(),
+                        satuan = "Kegiatan"
+                    )
+                )
+            }
+        }
+
+        return result
+    }
+
+    fun aggregateLkb(
+        dataKegiatan: List<KegiatanEntry>,
+        jadwalList: List<JadwalItem> = emptyList()
+    ): Map<String, Int> {
+        return aggregateLkbItems(dataKegiatan, jadwalList).associate { item ->
+            val num = item.jumlah.replace(Regex("[^0-9]"), "").toIntOrNull() ?: 1
+            item.kegiatan to num
+        }
     }
 
     // ==========================================
@@ -268,7 +539,8 @@ object PrintDocumentHelper {
         profile: UserProfile,
         dataKegiatan: List<KegiatanEntry>,
         selectedBulanFilter: String,
-        logoBitmap: Bitmap?
+        logoBitmap: Bitmap?,
+        jadwalList: List<JadwalItem> = emptyList()
     ): PdfDocument {
         val doc = PdfDocument()
         val tfBold = Typeface.create(Typeface.SERIF, Typeface.BOLD)
@@ -293,7 +565,7 @@ object PrintDocumentHelper {
         }
 
         if (type == "lkb" || type == "semua") {
-            drawLkbPage(doc, profile, dataKegiatan, strBulanTahun, tanggalCetak, logoBitmap, tfBold, tfNormal, pageCounter++)
+            drawLkbPage(doc, profile, dataKegiatan, strBulanTahun, tanggalCetak, logoBitmap, tfBold, tfNormal, pageCounter++, jadwalList)
         }
 
         return doc
@@ -488,7 +760,8 @@ object PrintDocumentHelper {
         logo: Bitmap?,
         tfBold: Typeface,
         tfNormal: Typeface,
-        pageNum: Int
+        pageNum: Int,
+        jadwalList: List<JadwalItem> = emptyList()
     ) {
         val pageInfo = PdfDocument.PageInfo.Builder(595, 842, pageNum).create()
         val page = doc.startPage(pageInfo)
@@ -530,18 +803,37 @@ object PrintDocumentHelper {
         currentY += 46f
 
         // Info Block
-        normPaint.textSize = 10f
-        val lblX = 45f
-        val colX = 130f
-        val valX = 140f
-        
-        fun drawInfoLkb(label: String, value: String, yOffset: Float) {
-            canvas.drawText(label, lblX, currentY + yOffset, normPaint)
-            canvas.drawText(":", colX, currentY + yOffset, normPaint)
-            canvas.drawText(value, valX, currentY + yOffset, normPaint)
+        val infoLkbLabelPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = Color.BLACK
+            typeface = tfBold
+            textAlign = Paint.Align.LEFT
+            textSize = 10f
+        }
+        val infoLkbValPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = Color.BLACK
+            typeface = tfNormal
+            textAlign = Paint.Align.LEFT
+            textSize = 10f
+        }
+        val infoLkbValBoldPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = Color.BLACK
+            typeface = tfBold
+            textAlign = Paint.Align.LEFT
+            textSize = 10f
         }
 
-        drawInfoLkb("Nama", profile.pegNama, 0f)
+        val lblX = 45f
+        val colX = 145f
+        val valX = 156f
+
+        fun drawInfoLkb(label: String, value: String, yOffset: Float, isValBold: Boolean = false) {
+            canvas.drawText(label, lblX, currentY + yOffset, infoLkbLabelPaint)
+            canvas.drawText(":", colX, currentY + yOffset, infoLkbLabelPaint)
+            val p = if (isValBold) infoLkbValBoldPaint else infoLkbValPaint
+            drawCanvasAutoFitText(canvas, value, valX, currentY + yOffset, p, targetSize = 10f, minSize = 3f, maxWidth = 550f - valX)
+        }
+
+        drawInfoLkb("Nama", profile.pegNama, 0f, isValBold = true)
         drawInfoLkb("NIP", profile.pegNIP, 14f)
         drawInfoLkb("Jabatan", profile.pegJabatan, 28f)
         currentY += 42f
@@ -575,22 +867,16 @@ object PrintDocumentHelper {
 
         currentY = thBot
 
-        val rekap = aggregateLkb(dataKegiatan)
+        val lkbItems = aggregateLkbItems(dataKegiatan, jadwalList)
         var rowIdx = 1
 
-        if (rekap.isEmpty()) {
+        if (lkbItems.isEmpty()) {
             val rHeight = 22f
             canvas.drawRect(colNo, currentY, colRight, currentY + rHeight, linePaint)
             canvas.drawText("Belum ada kegiatan tercatat pada bulan ini", 595f / 2, currentY + 15f, centerPaint)
             currentY += rHeight
         } else {
-            for ((key, count) in rekap) {
-                var volumeText = "Kegiatan"
-                var jumlah = count.toString()
-                if (key.contains("KBM", ignoreCase = true)) {
-                    volumeText = "Kegiatan"
-                    jumlah = "${count * 3} JP"
-                }
+            for (item in lkbItems) {
                 val rHeight = 22f
                 canvas.drawRect(colNo, currentY, colRight, currentY + rHeight, linePaint)
                 canvas.drawLine(colKeg, currentY, colKeg, currentY + rHeight, linePaint)
@@ -598,9 +884,9 @@ object PrintDocumentHelper {
                 canvas.drawLine(colSat, currentY, colSat, currentY + rHeight, linePaint)
 
                 canvas.drawText(rowIdx.toString(), (colNo + colKeg) / 2, currentY + 15f, centerPaint)
-                canvas.drawText(key, colKeg + 6f, currentY + 15f, normPaint)
-                canvas.drawText(jumlah, (colJml + colSat) / 2, currentY + 15f, centerPaint)
-                canvas.drawText(volumeText, (colSat + colRight) / 2, currentY + 15f, centerPaint)
+                drawCanvasAutoFitText(canvas, item.kegiatan, colKeg + 6f, currentY + 15f, normPaint, targetSize = 10f, minSize = 6.5f, maxWidth = colJml - colKeg - 12f)
+                canvas.drawText(item.jumlah, (colJml + colSat) / 2, currentY + 15f, centerPaint)
+                canvas.drawText(item.satuan, (colSat + colRight) / 2, currentY + 15f, centerPaint)
 
                 currentY += rHeight
                 rowIdx++
@@ -681,19 +967,37 @@ object PrintDocumentHelper {
         boldPaint.isUnderlineText = false
 
         var currentY = 70f
-        normPaint.textSize = 9.5f
-        
-        val lblX = 45f
-        val colX = 130f
-        val valX = 140f
-        
-        fun drawInfoLkh(label: String, value: String, yOffset: Float) {
-            canvas.drawText(label, lblX, currentY + yOffset, normPaint)
-            canvas.drawText(":", colX, currentY + yOffset, normPaint)
-            canvas.drawText(value, valX, currentY + yOffset, normPaint)
+        val infoLkhLabelPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = Color.BLACK
+            typeface = tfBold
+            textAlign = Paint.Align.LEFT
+            textSize = 9.5f
+        }
+        val infoLkhValPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = Color.BLACK
+            typeface = tfNormal
+            textAlign = Paint.Align.LEFT
+            textSize = 9.5f
+        }
+        val infoLkhValBoldPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = Color.BLACK
+            typeface = tfBold
+            textAlign = Paint.Align.LEFT
+            textSize = 9.5f
         }
 
-        drawInfoLkh("Nama", profile.pegNama.uppercase(Locale.getDefault()), 0f)
+        val lblX = 45f
+        val colX = 145f
+        val valX = 156f
+
+        fun drawInfoLkh(label: String, value: String, yOffset: Float, isValBold: Boolean = false) {
+            canvas.drawText(label, lblX, currentY + yOffset, infoLkhLabelPaint)
+            canvas.drawText(":", colX, currentY + yOffset, infoLkhLabelPaint)
+            val p = if (isValBold) infoLkhValBoldPaint else infoLkhValPaint
+            drawCanvasAutoFitText(canvas, value, valX, currentY + yOffset, p, targetSize = 9.5f, minSize = 3f, maxWidth = colRight - valX)
+        }
+
+        drawInfoLkh("Nama", profile.pegNama.uppercase(Locale.getDefault()), 0f, isValBold = true)
         drawInfoLkh("NIP", profile.pegNIP, 13f)
         drawInfoLkh("Jabatan", profile.pegJabatan, 26f)
         drawInfoLkh("Pangkat", profile.pegPangkat, 39f)
@@ -770,7 +1074,8 @@ object PrintDocumentHelper {
         profile: UserProfile,
         dataKegiatan: List<KegiatanEntry>,
         selectedBulanFilter: String,
-        logoBase64: String?
+        logoBase64: String?,
+        jadwalList: List<JadwalItem> = emptyList()
     ) {
         try {
             val printManager = context.getSystemService(Context.PRINT_SERVICE) as? PrintManager ?: run {
@@ -785,7 +1090,8 @@ object PrintDocumentHelper {
                 profile = profile,
                 dataKegiatan = dataKegiatan,
                 selectedBulanFilter = selectedBulanFilter,
-                logoBitmap = logoBmp
+                logoBitmap = logoBmp,
+                jadwalList = jadwalList
             )
 
             val adapter = object : PrintDocumentAdapter() {
@@ -853,7 +1159,8 @@ object PrintDocumentHelper {
         profile: UserProfile,
         dataKegiatan: List<KegiatanEntry>,
         selectedBulanFilter: String,
-        logoBase64: String?
+        logoBase64: String?,
+        jadwalList: List<JadwalItem> = emptyList()
     ) {
         try {
             val logoBmp = getEffectiveLogoBitmap(context, logoBase64)
@@ -863,7 +1170,8 @@ object PrintDocumentHelper {
                 profile = profile,
                 dataKegiatan = dataKegiatan,
                 selectedBulanFilter = selectedBulanFilter,
-                logoBitmap = logoBmp
+                logoBitmap = logoBmp,
+                jadwalList = jadwalList
             )
 
             val docsDir = File(context.cacheDir, "docs").apply { mkdirs() }

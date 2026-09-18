@@ -52,6 +52,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import coil.compose.AsyncImage
 import com.example.R
+import com.example.data.model.JadwalItem
 import com.example.data.model.KegiatanEntry
 import com.example.data.model.UserProfile
 import com.example.ui.components.SectionHeader
@@ -67,6 +68,7 @@ fun PusatCetakScreen(
     dataKegiatan: List<KegiatanEntry>,
     selectedBulan: String,
     logoBase64: String?,
+    jadwalList: List<JadwalItem> = emptyList(),
     isLoading: Boolean,
     onUploadLogo: (base64: String) -> Unit,
     onDeleteLogo: () -> Unit
@@ -447,7 +449,8 @@ fun PusatCetakScreen(
                                         profile = profile,
                                         dataKegiatan = dataKegiatan,
                                         selectedBulanFilter = selectedBulan,
-                                        logoBase64 = logoBase64
+                                        logoBase64 = logoBase64,
+                                        jadwalList = jadwalList
                                     )
                                 },
                                 shape = RoundedCornerShape(12.dp),
@@ -471,7 +474,8 @@ fun PusatCetakScreen(
                                         profile = profile,
                                         dataKegiatan = dataKegiatan,
                                         selectedBulanFilter = selectedBulan,
-                                        logoBase64 = logoBase64
+                                        logoBase64 = logoBase64,
+                                        jadwalList = jadwalList
                                     )
                                 },
                                 colors = ButtonDefaults.buttonColors(containerColor = NokiaCyan, contentColor = Color.White),
@@ -520,7 +524,8 @@ fun PusatCetakScreen(
                                     profile = profile,
                                     dataKegiatan = dataKegiatan,
                                     selectedBulan = selectedBulan,
-                                    customLogoBitmap = decodedLogoBitmap
+                                    customLogoBitmap = decodedLogoBitmap,
+                                    jadwalList = jadwalList
                                 )
                             }
                         }
@@ -558,7 +563,8 @@ private fun NativeDocumentSheetView(
     profile: UserProfile,
     dataKegiatan: List<KegiatanEntry>,
     selectedBulan: String,
-    customLogoBitmap: androidx.compose.ui.graphics.ImageBitmap?
+    customLogoBitmap: androidx.compose.ui.graphics.ImageBitmap?,
+    jadwalList: List<JadwalItem> = emptyList()
 ) {
     val (targetYear, targetMonthIndex) = remember(selectedBulan, dataKegiatan) {
         DateUtils.resolveYearAndMonth(selectedBulan, dataKegiatan.map { it.tanggal })
@@ -576,14 +582,14 @@ private fun NativeDocumentSheetView(
             NativeLkhSection(profile, dataKegiatan, tanggalCetak, customLogoBitmap)
         }
         "lkb" -> {
-            NativeLkbSection(profile, dataKegiatan, strBulanTahun, tanggalCetak, customLogoBitmap)
+            NativeLkbSection(profile, dataKegiatan, strBulanTahun, tanggalCetak, customLogoBitmap, jadwalList)
         }
         "semua" -> {
             NativeSampulSection(profile, strBulanTahun, customLogoBitmap)
             PageBreakBadge(pageNumber = 2, title = "LAPORAN KERJA HARIAN (LKH)")
             NativeLkhSection(profile, dataKegiatan, tanggalCetak, customLogoBitmap)
             PageBreakBadge(pageNumber = 3, title = "LAPORAN KERJA BULANAN (LKB)")
-            NativeLkbSection(profile, dataKegiatan, strBulanTahun, tanggalCetak, customLogoBitmap)
+            NativeLkbSection(profile, dataKegiatan, strBulanTahun, tanggalCetak, customLogoBitmap, jadwalList)
         }
     }
 }
@@ -889,7 +895,8 @@ private fun NativeLkbSection(
     dataKegiatan: List<KegiatanEntry>,
     strBulanTahun: String,
     tanggalCetak: String,
-    customLogoBitmap: androidx.compose.ui.graphics.ImageBitmap?
+    customLogoBitmap: androidx.compose.ui.graphics.ImageBitmap?,
+    jadwalList: List<JadwalItem> = emptyList()
 ) {
     NativeKopSuratView(profile.pegSatker, customLogoBitmap)
 
@@ -916,15 +923,15 @@ private fun NativeLkbSection(
     Spacer(modifier = Modifier.height(14.dp))
 
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        IdentitasRow("Nama", profile.pegNama, labelWidth = 100.dp, fontSize = 10.sp, isBold = true)
-        IdentitasRow("NIP", profile.pegNIP, labelWidth = 100.dp, fontSize = 10.sp)
-        IdentitasRow("Jabatan", profile.pegJabatan, labelWidth = 100.dp, fontSize = 10.sp)
+        IdentitasRow("Nama", profile.pegNama, labelWidth = 110.dp, fontSize = 10.sp, isBold = true)
+        IdentitasRow("NIP", profile.pegNIP, labelWidth = 110.dp, fontSize = 10.sp)
+        IdentitasRow("Jabatan", profile.pegJabatan, labelWidth = 110.dp, fontSize = 10.sp)
     }
 
     Spacer(modifier = Modifier.height(14.dp))
 
     // Structured Table
-    val rekap = PrintDocumentHelper.aggregateLkb(dataKegiatan)
+    val lkbItems = PrintDocumentHelper.aggregateLkbItems(dataKegiatan, jadwalList)
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -991,7 +998,7 @@ private fun NativeLkbSection(
         }
 
         // Table Rows
-        if (rekap.isEmpty()) {
+        if (lkbItems.isEmpty()) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -1002,14 +1009,7 @@ private fun NativeLkbSection(
             }
         } else {
             var index = 1
-            for ((key, count) in rekap) {
-                var volumeText = "Kegiatan"
-                var jumlah = count.toString()
-                if (key.contains("KBM", ignoreCase = true)) {
-                    volumeText = "Kegiatan"
-                    jumlah = "${count * 3} JP"
-                }
-
+            for (item in lkbItems) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -1030,7 +1030,7 @@ private fun NativeLkbSection(
                             .border(0.5.dp, Color.Black)
                             .padding(horizontal = 8.dp, vertical = 6.dp)
                     ) {
-                        Text(key, fontSize = 9.5.sp, fontFamily = FontFamily.Serif, color = Color.Black)
+                        Text(item.kegiatan, fontSize = 9.5.sp, fontFamily = FontFamily.Serif, color = Color.Black)
                     }
                     Row(
                         modifier = Modifier
@@ -1043,7 +1043,7 @@ private fun NativeLkbSection(
                                 .padding(vertical = 6.dp),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text(jumlah, fontSize = 9.5.sp, fontFamily = FontFamily.Serif, color = Color.Black)
+                            Text(item.jumlah, fontSize = 9.5.sp, fontFamily = FontFamily.Serif, color = Color.Black)
                         }
                         Box(
                             modifier = Modifier
@@ -1052,7 +1052,7 @@ private fun NativeLkbSection(
                                 .padding(vertical = 6.dp),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text(volumeText, fontSize = 9.5.sp, fontFamily = FontFamily.Serif, color = Color.Black)
+                            Text(item.satuan, fontSize = 9.5.sp, fontFamily = FontFamily.Serif, color = Color.Black)
                         }
                     }
                 }
@@ -1088,11 +1088,11 @@ private fun NativeLkhSection(
     Spacer(modifier = Modifier.height(14.dp))
 
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        IdentitasRow("Nama", profile.pegNama.uppercase(Locale.getDefault()), labelWidth = 100.dp, fontSize = 9.5.sp, isBold = true)
-        IdentitasRow("NIP", profile.pegNIP, labelWidth = 100.dp, fontSize = 9.5.sp)
-        IdentitasRow("Jabatan", profile.pegJabatan, labelWidth = 100.dp, fontSize = 9.5.sp)
-        IdentitasRow("Pangkat", profile.pegPangkat, labelWidth = 100.dp, fontSize = 9.5.sp)
-        IdentitasRow("Golongan", profile.pegGolongan, labelWidth = 100.dp, fontSize = 9.5.sp)
+        IdentitasRow("Nama", profile.pegNama.uppercase(Locale.getDefault()), labelWidth = 110.dp, fontSize = 9.5.sp, isBold = true)
+        IdentitasRow("NIP", profile.pegNIP, labelWidth = 110.dp, fontSize = 9.5.sp)
+        IdentitasRow("Jabatan", profile.pegJabatan, labelWidth = 110.dp, fontSize = 9.5.sp)
+        IdentitasRow("Pangkat", profile.pegPangkat, labelWidth = 110.dp, fontSize = 9.5.sp)
+        IdentitasRow("Golongan", profile.pegGolongan, labelWidth = 110.dp, fontSize = 9.5.sp)
     }
 
     Spacer(modifier = Modifier.height(14.dp))
